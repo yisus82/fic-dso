@@ -1,0 +1,153 @@
+0xbffffc8c	------>	0xc9 (201)-----------------> array[0]	\
+0xbffffc90	------>	0xca (202)-----------------> array[1]	 \
+0xbffffc94	------>	0xcb (203)-----------------> array[2]	  |--> variable local array
+0xbffffc98	------>	0xcc (204)-----------------> array[3]	 /
+0xbffffc9c	------>	0xcd (205)-----------------> array[4]	/
+0xbffffca0	------>	0x309 (777)----------------> variable local k
+0xbffffca4	------>	0x6 (6)--------------------> variable local j
+0xbffffca8	------>	0x22b (555)----------------> variable local i
+0xbffffcac	------>	0xbffffcfc (3221224700)----> direccion frame anterior
+0xbffffcb0	------>	0x804846f (134513775)------> direccion de retorno (PC) --> funcion f
+0xbffffcb4	------>	0x1 (1)--------------------> argumento a
+0xbffffcb8	------>	0xc8 (200)-----------------> argumento b
+0xbffffcbc	------>	0x1b (27)------------------> argumento c
+0xbffffcc0	------>	0x40013b00 (1073822464)
+0xbffffcc4	------>	0x7 (7)
+0xbffffcc8	------>	0x40023b98 (1073888152)
+0xbffffccc	------>	0x40013b00 (1073822464)
+0xbffffcd0	------>	0xbffffcf8 (3221224696)----> direccion frame anterior 
+0xbffffcd4	------>	0x8048188 (134513032)------> direccion de retorno (PC) --> funcion main
+0xbffffcd8	------>	0x400137bc (1073821628)
+-----------------------------------------------------------------------------------------------------
+0xbffffcdc	------>	0x15 (21)------------------> array[0]	\
+0xbffffce0	------>	0x16 (22)------------------> array[1]	 \
+0xbffffce4	------>	0x17 (23)------------------> array[2]	  |--> variable local array
+0xbffffce8	------>	0x18 (24)------------------> array[3]	 /
+0xbffffcec	------>	0x19 (25)------------------> array[4]	/
+0xbffffcf0	------>	0x309 (777)----------------> variable local k
+0xbffffcf4	------>	0x5 (5)--------------------> variable local j
+0xbffffcf8	------>	0x22b (555)----------------> variable local i
+0xbffffcfc	------>	0xbffffd4c (3221224780)----> direccion frame anterior
+0xbffffd00	------>	0x804846f (134513775)------> direccion de retorno (PC) --> funcion f 
+0xbffffd04	------>	0x1 (1)--------------------> argumento a
+0xbffffd08	------>	0x14 (20)------------------> argumento b
+0xbffffd0c	------>	0x9 (9)--------------------> argumento c
+0xbffffd10	------>	0xbffffdd4 (3221224916)----> direccion frame anterior
+0xbffffd14	------>	0x40133e48 (1075002952)
+0xbffffd18	------>	0xbffffd48 (3221224776)----> direccion de retorno (PC)
+0xbffffd1c	------>	0x4011418e (1074872718)
+------------------------------------------------------------------------------------------------------
+0xbffffd20	------>	0x804958c (134518156)
+0xbffffd24	------>	0x8049688 (134518408)
+0xbffffd28	------>	0x0 (0)
+0xbffffd2c	------>	0x3 (3)
+0xbffffd30	------>	0x4 (4)
+0xbffffd34	------>	0x5 (5)
+0xbffffd38	------>	0x6 (6)
+0xbffffd3c	------>	0x7 (7)
+0xbffffd40	------>	0x309 (777)----------------> variable local k
+0xbffffd44	------>	0x5 (5)--------------------> variable local j
+0xbffffd48	------>	0x22b (555)----------------> variable local i
+0xbffffd4c	------>	0xbffffd6c (3221224812)
+0xbffffd50	------>	0x80484fc (134513916)
+0xbffffd54	------>	0x1 (1)--------------------> argumento a
+0xbffffd58	------>	0x2 (2)--------------------> argumento b
+0xbffffd5c	------>	0x3 (3)--------------------> argumento c
+0xbffffd60	------>	0x40133e48 (1075002952)
+0xbffffd64	------>	0x400097c0 (1073780672)
+0xbffffd68	------>	0xbffffd88 (3221224840)----> direccion frame anterior
+0xbffffd6c	------>	0xbffffda8 (3221224872)----> direccion de retorno (PC)
+------------------------------------------------------------------------------------------------
+0xbffffd70	------>	0x4003514f (1073959247)
+0xbffffd74	------>	0x1 (1)
+0xbffffd78	------>	0xbffffdd4 (3221224916)
+0xbffffd7c	------>	0xbffffddc (3221224924)
+0xbffffd80	------>	0x8048540 (134513984)
+0xbffffd84	------>	0x0 (0)
+0xbffffd88	------>	0xbffffda8 (3221224872)
+0xbffffd8c	------>	0x40035121 (1073959201)
+0xbffffd90	------>	0x400130ec (1073819884)
+0xbffffd94	------>	0x1 (1)
+0xbffffd98	------>	0x8048310 (134513424)
+0xbffffd9c	------>	0xbffffdd4 (3221224916)
+0xbffffda0	------>	0x40035094 (1073959060)
+0xbffffda4	------>	0x40131cc0 (1074994368)
+0xbffffda8	------>	0x0 (0)
+0xbffffdac	------>	0x8048331 (134513457)
+0xbffffdb0	------>	0x80484e8 (134513896)
+0xbffffdb4	------>	0x1 (1)
+0xbffffdb8	------>	0xbffffdd4 (3221224916)
+0xbffffdbc	------>	0x8048298 (134513304)
+0xbffffdc0	------>	0x8048540 (134513984)
+0xbffffdc4	------>	0x40009e50 (1073782352)
+0xbffffdc8	------>	0xbffffdcc (3221224908)
+0xbffffdcc	------>	0x4001362c (1073821228)
+0xbffffdd0	------>	0x1 (1)
+0xbffffdd4	------>	0xbffffeb0 (3221225136)
+0xbffffdd8	------>	0x0 (0)
+0xbffffddc	------>	0xbffffeb8 (3221225144)
+0xbffffde0	------>	0xbffffed4 (3221225172)
+0xbffffde4	------>	0xbffffeed (3221225197)
+0xbffffde8	------>	0xbffffef4 (3221225204)
+0xbffffdec	------>	0xbfffff04 (3221225220)
+0xbffffdf0	------>	0xbfffff12 (3221225234)
+0xbffffdf4	------>	0xbfffff2a (3221225258)
+0xbffffdf8	------>	0xbfffff42 (3221225282)
+0xbffffdfc	------>	0xbfffff57 (3221225303)
+0xbffffe00	------>	0xbfffff68 (3221225320)
+0xbffffe04	------>	0xbfffff70 (3221225328)
+0xbffffe08	------>	0xbfffff80 (3221225344)
+0xbffffe0c	------>	0xbfffff8f (3221225359)
+0xbffffe10	------>	0xbfffff9a (3221225370)
+0xbffffe14	------>	0xbfffffb0 (3221225392)
+0xbffffe18	------>	0xbfffffea (3221225450)
+0xbffffe1c	------>	0x0 (0)
+0xbffffe20	------>	0x10 (16)
+0xbffffe24	------>	0x183fbff (25426943)
+0xbffffe28	------>	0x6 (6)
+0xbffffe2c	------>	0x1000 (4096)
+0xbffffe30	------>	0x11 (17)
+0xbffffe34	------>	0x64 (100)
+0xbffffe38	------>	0x3 (3)
+0xbffffe3c	------>	0x8048034 (134512692)
+0xbffffe40	------>	0x4 (4)
+0xbffffe44	------>	0x20 (32)
+0xbffffe48	------>	0x5 (5)
+0xbffffe4c	------>	0x6 (6)
+0xbffffe50	------>	0x7 (7)
+0xbffffe54	------>	0x40000000 (1073741824)
+0xbffffe58	------>	0x8 (8)
+0xbffffe5c	------>	0x0 (0)
+0xbffffe60	------>	0x9 (9)
+0xbffffe64	------>	0x8048310 (134513424)
+0xbffffe68	------>	0xb (11)
+0xbffffe6c	------>	0x5666 (22118)
+0xbffffe70	------>	0xc (12)
+0xbffffe74	------>	0x5666 (22118)
+0xbffffe78	------>	0xd (13)
+0xbffffe7c	------>	0x5208 (21000)
+0xbffffe80	------>	0xe (14)
+0xbffffe84	------>	0x5208 (21000)
+0xbffffe88	------>	0xf (15)
+0xbffffe8c	------>	0xbffffeab (3221225131)
+0xbffffe90	------>	0x0 (0)
+0xbffffe94	------>	0x0 (0)
+0xbffffe98	------>	0x0 (0)
+0xbffffe9c	------>	0x0 (0)
+0xbffffea0	------>	0x0 (0)
+0xbffffea4	------>	0x0 (0)
+0xbffffea8	------>	0x69000000 (1761607680)
+0xbffffeac	------>	0x363836 (3553334)
+0xbffffeb0	------>	0x696c2f2e (1768697646)
+0xbffffeb4	------>	0x61696d (6383981)
+0xbffffeb8	------>	0x3d445750 (1027888976)
+0xbffffebc	------>	0x6d6f682f (1836017711)
+0xbffffec0	------>	0x2f692f65 (795422565)
+0xbffffec4	------>	0x6a666e69 (1785097833)
+0xbffffec8	------>	0x32306670 (842032752)
+0xbffffecc	------>	0x4f53442f (1330857007)
+0xbffffed0	------>	0x31502f (3231791)
+0xbffffed4	------>	0x4f4d4552 (1330464082)
+0xbffffed8	------>	0x4f484554 (1330136404)
+0xbffffedc	------>	0x313d5453 (826102867)
+0xbffffee0	------>	0x30312e30 (808529456)

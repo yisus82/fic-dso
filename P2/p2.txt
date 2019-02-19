@@ -1,0 +1,278 @@
+/*******************************************************/
+/*******************************************************/
+/***************** PRACTICA DE DSO *********************/
+/*******************************************************/
+/****************** REALIZADA POR: *********************/
+/*******************************************************/
+/*********** Jesus Angel Perez-Roca Fernandez **********/
+/**************** (infjpf02) ***************************/
+/*******************************************************/
+/*******************************************************/
+
+
+Todas las partes de esta practica se han ejecutado en el servidor limia, que tiene instalado Linux.
+
+PARTE 1: SALTO DE UNA INSTRUCCION
+=================================
+
+El objetivo de este programa es saltarse una instruccion de codigo modificando la direccion de retorno de otra 
+funcion. En el programa que viene a continuacion se modifica la direccion de retorno de la funcion f()
+sobredimensionando la variable array, de forma que nos saltamos el primer printf del main. Para realizar el salto,
+debemos sumar un cierto valor a la direccion de retorno de f(). Para saber en que posicion del stack esta dicha
+direccion de retorno nos basamos en lo obtenido en la primera practica (que consistia en mirar el contenido del
+stack en varios sitemas operativos) y nos encontramos que justo despues de las variables locales estan la direccion
+del frame anterior y la direccion de retorno (que es la que queremos cambiar), por lo que cambiaremos el valor de
+array[6]. Para saber cuanto hay que sumarle se miro el codigo desensamblado de la funcion main() y se vio que 
+para saltar el primer printf y solo ejecutar el segundo habia que sumarle 13. El codigo usado para esta parte
+de la practica es el siguiente:
+
+#include <stdio.h>
+
+void f() {
+	unsigned int array[5];
+	array[6]+=13;
+}
+
+main () {
+	f();
+	printf("\nmain: El salto NO ha funcionado\n");
+	printf("\nmain: El salto SI ha funcionado\n");
+}
+
+
+Al ejecutar este codigo, se obtiene lo siguiente:
+
+$./p2a
+
+main: el salto SI ha funcionado
+$
+
+
+PARTE 2: MODIFICACION DE UNA VARIABLE LOCAL DE UNA FUNCION
+==========================================================
+
+El objetivo de esta parte es modificar una variable local de una funcion desde otra. Para ello buscamos una de
+las posiciones de la pila que tiene el valor de la variable a cambiar (en el ejemplo es 666) y lo cambiamos por
+otro (777). Buscaremos el valor que queremos sustituir cuando el valor que se le pasa a la funcion es cuatro. Para 
+ello buscaremos a partir de array[10] (para no modificar el valor de la variable de esta iteracion y pasar al 
+siguiente frame) y cuando encontremos una posicion con valor 666 la cambiaremos y abandonaremos la busqueda
+(para no cambiar el valor de x de las iteraciones 2, 1 y 0). El codigo usado para esta parte de la practica es el 
+siguiente:
+
+#include <stdio.h>
+
+void f(int iteracion) {
+	unsigned int i, x;
+	unsigned int array[5];
+
+	x = 666;
+	for (i = 0; i < 5; i++) array[i] = 10*iteracion+i;
+	printf("Entrando en la iteracion %d de f() con valor de x: %u\n", iteracion, x);
+	if (iteracion == 4) 
+		for (i = 10; i < 100; i++) {
+				if (array[i] == 666) {
+					array[i] = 777;
+					break;
+				}
+			}
+	if (iteracion < 5) f(iteracion + 1);
+	printf("Saliendo de la iteracion %d de f() con valor de x: %u\n", iteracion, x);
+}
+
+main() {
+	f(0);
+}
+
+Al ejecutar el codigo, se obtiene lo siguiente:
+
+$./p2b
+Entrando en la iteracion 0 de f() con valor de x: 666
+Entrando en la iteracion 1 de f() con valor de x: 666
+Entrando en la iteracion 2 de f() con valor de x: 666
+Entrando en la iteracion 3 de f() con valor de x: 666
+Entrando en la iteracion 4 de f() con valor de x: 666
+Entrando en la iteracion 5 de f() con valor de x: 666
+Saliendo de la iteracion 5 de f() con valor de x: 666
+Saliendo de la iteracion 4 de f() con valor de x: 666
+Saliendo de la iteracion 3 de f() con valor de x: 777
+Saliendo de la iteracion 2 de f() con valor de x: 666
+Saliendo de la iteracion 1 de f() con valor de x: 666
+Saliendo de la iteracion 0 de f() con valor de x: 666
+$
+
+Vemos que se modifica el valor de la variable x en la iteracion 3 y solo en esa iteracion.
+
+PARTE 3: MODIFICACION DE LA DIRECCION DE RETORNO Y DE LA DIRECCION DEL FRAME ANTERIOR
+=====================================================================================
+
+Esta parte de la practica consiste en hacer una serie de llamadas alternativas de dos funciones f() y g()
+con recursividad indirecta y, en la ultima iteracion de f() modificar los valores de su direccion de retorno
+y de frame anterior por los de otra iteracion anterior de f(). Para ello primero calculamos experimentalmente
+la longitud conjunta de un frame de f() y uno de g(). Con este valor (en este caso 24) podemos saltar un numero
+de frames de f por medio de la variable cantidad. El codigo usado para esta parte de la practica es el siguiente:
+
+#include <stdio.h>
+
+#define SALTO 24 //Longitud de frames (longitud frame f + longitud frame g)
+
+int cantidad=0; //Numero de iteraciones que se quieren saltar
+
+void f(int iteracion);
+
+void g(int iteracion) {
+	printf("Entrando en la iteracion %d de g()\n", iteracion);
+	if (iteracion < 10) f(iteracion + 1);
+	printf("Saliendo de la iteracion %d de g()\n", iteracion);
+}
+
+void f(int iteracion) {
+	unsigned int i;
+	unsigned int array[5];
+
+	for (i = 0; i < 5; i++) array[i] = 10*iteracion+i;
+	
+	if (iteracion == 10) {
+		array[6] = array[6+cantidad*SALTO];
+		array[7] = array[7+cantidad*SALTO];
+	}
+	printf("Entrando en la iteracion %d de f()\n", iteracion);
+	g(iteracion);
+	printf("Saliendo de la iteracion %d de f()\n", iteracion);
+}
+
+main() {
+	f(0);
+}
+
+Al ejecutar el codigo con cantidad=0, se obtiene lo siguiente:
+
+$./p2c
+Entrando en la iteracion 0 de f()
+Entrando en la iteracion 0 de g()
+Entrando en la iteracion 1 de f()
+Entrando en la iteracion 1 de g()
+Entrando en la iteracion 2 de f()
+Entrando en la iteracion 2 de g()
+Entrando en la iteracion 3 de f()
+Entrando en la iteracion 3 de g()
+Entrando en la iteracion 4 de f()
+Entrando en la iteracion 4 de g()
+Entrando en la iteracion 5 de f()
+Entrando en la iteracion 5 de g()
+Entrando en la iteracion 6 de f()
+Entrando en la iteracion 6 de g()
+Entrando en la iteracion 7 de f()
+Entrando en la iteracion 7 de g()
+Entrando en la iteracion 8 de f()
+Entrando en la iteracion 8 de g()
+Entrando en la iteracion 9 de f()
+Entrando en la iteracion 9 de g()
+Entrando en la iteracion 10 de f()
+Entrando en la iteracion 10 de g()
+Saliendo de la iteracion 10 de g()
+Saliendo de la iteracion 10 de f()
+Saliendo de la iteracion 9 de g()
+Saliendo de la iteracion 9 de f()
+Saliendo de la iteracion 8 de g()
+Saliendo de la iteracion 8 de f()
+Saliendo de la iteracion 7 de g()
+Saliendo de la iteracion 7 de f()
+Saliendo de la iteracion 6 de g()
+Saliendo de la iteracion 6 de f()
+Saliendo de la iteracion 5 de g()
+Saliendo de la iteracion 5 de f()
+Saliendo de la iteracion 4 de g()
+Saliendo de la iteracion 4 de f()
+Saliendo de la iteracion 3 de g()
+Saliendo de la iteracion 3 de f()
+Saliendo de la iteracion 2 de g()
+Saliendo de la iteracion 2 de f()
+Saliendo de la iteracion 1 de g()
+Saliendo de la iteracion 1 de f()
+Saliendo de la iteracion 0 de g()
+Saliendo de la iteracion 0 de f()
+$
+
+Al ejecutar el codigo con cantidad=5, se obtiene lo siguiente:
+
+Entrando en la iteracion 0 de f()
+Entrando en la iteracion 0 de g()
+Entrando en la iteracion 1 de f()
+Entrando en la iteracion 1 de g()
+Entrando en la iteracion 2 de f()
+Entrando en la iteracion 2 de g()
+Entrando en la iteracion 3 de f()
+Entrando en la iteracion 3 de g()
+Entrando en la iteracion 4 de f()
+Entrando en la iteracion 4 de g()
+Entrando en la iteracion 5 de f()
+Entrando en la iteracion 5 de g()
+Entrando en la iteracion 6 de f()
+Entrando en la iteracion 6 de g()
+Entrando en la iteracion 7 de f()
+Entrando en la iteracion 7 de g()
+Entrando en la iteracion 8 de f()
+Entrando en la iteracion 8 de g()
+Entrando en la iteracion 9 de f()
+Entrando en la iteracion 9 de g()
+Entrando en la iteracion 10 de f()
+Entrando en la iteracion 10 de g()
+Saliendo de la iteracion 10 de g()
+Saliendo de la iteracion 10 de f()
+Saliendo de la iteracion 4 de g()
+Saliendo de la iteracion 4 de f()
+Saliendo de la iteracion 3 de g()
+Saliendo de la iteracion 3 de f()
+Saliendo de la iteracion 2 de g()
+Saliendo de la iteracion 2 de f()
+Saliendo de la iteracion 1 de g()
+Saliendo de la iteracion 1 de f()
+Saliendo de la iteracion 0 de g()
+Saliendo de la iteracion 0 de f()
+$
+
+PARTE 4: LLAMADA A UNA FUNCION
+==============================
+
+El objetivo de esta parte de la practica es conseguir que se ejecute una funcion g(), que no ha sido llamada
+explicitamente en ningun lugar del codigo. Para ello se modifican los valores de la direccion de retorno y 
+de frame anterior de la funcion f() para que en lugar de que vuelva al main() llame a g(). Ademas hay que
+modificar los valores de las dos ultimas posiciones del frame anterior(array[-2] y array[-1]) para que se 
+conviertan en los valores de la direccion de retorno y de frame anterior de la funcion g() que vamos a llamar.
+Estos valores deben ser los que tenia la funcion f(). El codigo usado en esta parte de la practica es el siguiente:
+
+#include <stdio.h>
+
+int i=0;
+
+void g() {
+	unsigned int array[5];
+
+	i=1;	
+}
+
+void f() {
+	unsigned int array[5];
+	
+	array[-2] = array[5];
+	array[-1] = array[6];
+	array[5] = (unsigned int) &array[-2];
+	array[6] = (unsigned int) g;
+}
+
+main() {
+
+	printf("El valor de i es %d\n",i);
+	f();
+	printf("El valor de i es %d\n",i);	
+
+}
+
+Al ejecutar el codigo, obtenemos lo siguiente:
+
+$./p2d
+El valor de i es 0
+El valor de i es 1
+$
+
+Como vemos el valor de la variable global i ha cambiado, ya que se ejecuto la funcion g().

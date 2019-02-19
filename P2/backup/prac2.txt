@@ -1,0 +1,425 @@
+Rafael López García (infrlg01)
+5 Ingeniería Informática
+Curso 2004 - 2005
+
+DSO - Segunda Práctica
+
+Nota:
+Todas las prácticas se han ejecutado en MS-DOS emulado por WINDOWS XP tras ser compiladas con BORLAND C. Para ello se
+han desactivado las optimizaciones del compilador.
+
+PARTE 1: SALTOS TEMPORALES DE INSTRUCCIONES MEDIANTE DESBORDAMIENTO DE ARRAY
+
+El objetivo de este programa es saltarse una instrucción de código modificando la dirección de retorno de otra función.
+En el programa que viene a continuación se modifica la dirección de retorno de la función g() sobredimensionado el array
+"datos", de forma que nos saltamos la instrucción marcada en el código de f(). Para realizar el salto, debemos sumar un
+cierto valor a la dirección de retorno de g().
+
+Este programa se compila con Borland C para MS-DOS. Al compilarlo debemos hacer caso omiso de los avisos de condiciones
+siempre ciertas o siempre falsas, código imposible de alcanzar, etc.
+
+#include <stdio.h>
+
+#define TAMANO 3
+#define POSICION 5
+#define SALTAR 1
+#define CUANTAS 2
+
+//NOTA: g() no debe modificar nunca el valor de la variable x
+void g(void) {
+	unsigned int i;
+	unsigned int datos[TAMANO];
+
+	for (i = 0; i < TAMANO; i++) datos[i] = 666;
+	//for (i = 0; i < 15; i++) printf("%x -> %x (%u)\n", &datos[i], datos[i], datos[i]);
+	if (SALTAR)
+		datos[POSICION] += CUANTAS;
+}
+
+void f(void) {
+	unsigned int x;
+
+	x = 0;
+	g();
+	if (x != 0)		/*INSTRUCCION QUE NOS VAMOS A SALTAR*/
+		x = 3 + x;	/*INSTRUCCION INALCANZABLE QUE PRETENDEMOS EJECUTAR*/
+	printf("Valor de x: %u\n", x);
+}
+
+int main(void) {
+	f();
+	return 0;
+}
+
+Debemos fijarnos en el contenido de la macro SALTAR. Un valor 0 indica que no nos saltamos la instrucción marcada y por
+tanto el resultado de ejecutar el programa sería:
+
+Valor de x: 0
+
+Sin embargo si el valor de SALTAR es distinto de 0, por ejemplo 1, el resultado de la ejecución es: 
+
+Valor de x: 3
+
+Esto se debe a que la sentencia x = x + 3 ya se ha ejecutado porque no se comprobó la condición x != 0.
+
+Para conseguir este resultados se modifica la dirección de retorno de g, colocándola en una posición que se sitúe tras la
+instrucción que nos vamos a saltar. Utilizando el printf() que está comentado vemos cual es la dirección del stack que
+tenemos que machacar. Por último, en la macro CUANTAS se especifica el número de instrucciones que hay que añadir a la
+dirección donde volvemos a f() para situarnos en la sentencia x = 3 + x (en realidad, en la instrucción en ensamblador
+que realiza la asignación). 
+
+Este número de palabras de procesador a añadir es 2 y fue obtenido por experimentación, teniendo en cuenta que bajo
+MS-DOS el tamaño de palabra es 2 bytes, con lo cual debemos ir aumentando o disminuyendo el valor de 2 en 2. Se puede
+probar fácilmente que con valor 0 el valor final de x es un valor 0, debido a que estamos ejecutando la sentencia if.
+
+Es importante que el valor de x no se modifique en la llamada a g() para que la condición if (x != 0) sea teóricamente
+imposible de evaluar como verdadera.
+
+PARTE 2: MODIFICACIÓN DE LAS VARIABLES LOCALES DE UNA FUNCIÓN MEDIANTE DESBORDAMIENTO DE ARRAY
+
+El objetivo de esta parte de la práctica es modificar las variables locales de una función desde otra función empleando
+el sobredimensionamiento de un array. Para ello, como sabemos que las variables tendrán un cierto valor, buscamos una
+de las posiciones de la pila que tiene ese valor (en el ejemplo es 777) y lo cambiamos por otro (ej: 888). Para que el
+cambio de refleje sólo en una de las llamadas recursivas muy anteriores, comenzaremos buscando el valor que queremos
+sustituir desde la mitad de la pila y en cuanto realicemos una sustitución abandonaremos la búsqueda. Podría darse el
+caso en que uno de los valores de la pila tuviera este valor y no fuese una variable local de f(), pero esa probabilidad
+es despreciable en esta práctica.
+
+Si quisiéramos fingir que no conocemos el valor de la variable que vamos a sustituir, podríamos probar el método de
+experimentación, utilizando la línea que está comentada en el código, la cual imprime la pila.
+
+El código empleado para realizar la práctica es:
+
+#include <stdio.h>
+
+#define TAMANO 3
+#define LIMITE 10
+#define CAMBIAR 1
+
+void f(int iteracion) {
+	unsigned int i, x;
+	unsigned int datos[TAMANO];
+
+	x = 777;
+	for (i = 0; i < TAMANO; i++) datos[i] = 666;
+	printf("Entrando en la iteracion %d de f() con valor de x: %u\n", iteracion, x);
+	if (iteracion == LIMITE - 1) {
+		if (CAMBIAR) {
+			for (i = 50; i < 120; i++) {
+				if (datos[i] == 777) {
+					datos[i] = 888;
+					break;
+				}
+			}
+		}
+		//for (i = 0; i < 140; i++) printf("%x -> %x (%u)\n", &datos[i], datos[i], datos[i]);
+	}
+	if (iteracion < LIMITE) f(iteracion + 1);
+	printf("Saliendo de la iteracion %d de f() con valor de x: %u\n", iteracion, x);
+}
+
+int main(void) {
+	f(0);
+	return 0;
+}
+
+La macro CAMBIAR nos permite decidir si queremos que se haga el cambio del valor de la variable o no.
+
+Una ejecución del código si no se hace el cambio de valor de la variable (CAMBIAR = 0) da el siguiente resultado:
+
+Entrando en la iteracion 0 de f() con valor de x: 777
+Entrando en la iteracion 1 de f() con valor de x: 777
+Entrando en la iteracion 2 de f() con valor de x: 777
+Entrando en la iteracion 3 de f() con valor de x: 777
+Entrando en la iteracion 4 de f() con valor de x: 777
+Entrando en la iteracion 5 de f() con valor de x: 777
+Entrando en la iteracion 6 de f() con valor de x: 777
+Entrando en la iteracion 7 de f() con valor de x: 777
+Entrando en la iteracion 8 de f() con valor de x: 777
+Entrando en la iteracion 9 de f() con valor de x: 777
+Entrando en la iteracion 10 de f() con valor de x: 777
+Saliendo de la iteracion 10 de f() con valor de x: 777
+Saliendo de la iteracion 9 de f() con valor de x: 777
+Saliendo de la iteracion 8 de f() con valor de x: 777
+Saliendo de la iteracion 7 de f() con valor de x: 777
+Saliendo de la iteracion 6 de f() con valor de x: 777
+Saliendo de la iteracion 5 de f() con valor de x: 777
+Saliendo de la iteracion 4 de f() con valor de x: 777
+Saliendo de la iteracion 3 de f() con valor de x: 777
+Saliendo de la iteracion 2 de f() con valor de x: 777
+Saliendo de la iteracion 1 de f() con valor de x: 777
+Saliendo de la iteracion 0 de f() con valor de x: 777
+
+Vemos que no se modifica ningún valor.
+
+La ejecucion realizando el cambio (CAMBIAR = 1) arroja el resultado:
+
+Entrando en la iteracion 0 de f() con valor de x: 777
+Entrando en la iteracion 1 de f() con valor de x: 777
+Entrando en la iteracion 2 de f() con valor de x: 777
+Entrando en la iteracion 3 de f() con valor de x: 777
+Entrando en la iteracion 4 de f() con valor de x: 777
+Entrando en la iteracion 5 de f() con valor de x: 777
+Entrando en la iteracion 6 de f() con valor de x: 777
+Entrando en la iteracion 7 de f() con valor de x: 777
+Entrando en la iteracion 8 de f() con valor de x: 777
+Entrando en la iteracion 9 de f() con valor de x: 777
+Entrando en la iteracion 10 de f() con valor de x: 777
+Saliendo de la iteracion 10 de f() con valor de x: 777
+Saliendo de la iteracion 9 de f() con valor de x: 777
+Saliendo de la iteracion 8 de f() con valor de x: 777
+Saliendo de la iteracion 7 de f() con valor de x: 777
+Saliendo de la iteracion 6 de f() con valor de x: 777
+Saliendo de la iteracion 5 de f() con valor de x: 777
+Saliendo de la iteracion 4 de f() con valor de x: 777
+Saliendo de la iteracion 3 de f() con valor de x: 888
+Saliendo de la iteracion 2 de f() con valor de x: 777
+Saliendo de la iteracion 1 de f() con valor de x: 777
+Saliendo de la iteracion 0 de f() con valor de x: 777
+
+Podemos comprobar que la variable x tiene un valor distinto en otro punto de la función sin haber hecho una asignación
+explícita sobre la variable. Esto se debe a que el programa ha modificado su valor al escribir en el array datos[] que
+se había sobredimensionado.
+
+PARTE 3: MODIFICACION DE LA DIRECCION DE RETORNO Y EL PUNTERO DE FRAME ANTERIOR MEDIANTE DESBORDAMIENTO DE ARRAY
+
+En esta ocasión queremos hacer una serie de llamadas alternativas de dos funciones f() y g() con recursividad indirecta.
+Sin embargo, en la última llamada de f() podremos elegir entre varias opciones:
+1) Deshacer las llamadas recursivas de forma normal.
+2) Volver a una iteración anterior de f().
+3) Volver a una iteración anterior de g().
+4) Saltar a una dirección de una función h() que está en el código pero que nunca es llamada.
+
+Para realizar esta sección dispondremos del siguiente código:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TAMANO 3
+#define LIMITE 10
+#define POSICION 5
+#define NUEVA_POS1 65
+#define NUEVA_POS2 69
+#define NUEVA_POS3 114
+#define SALTAR 3
+
+void f(int iteracion);
+
+void h(void) {
+	printf("Hola Mundo\n");
+   	exit(0);
+}
+
+void g(int iteracion) {
+	unsigned int y;
+
+	y = 777;
+	printf("Entrando en la iteracion %d de g() con valor de y: %u\n", iteracion, y);
+	if (iteracion < LIMITE) f(iteracion + 1);
+	printf("Saliendo de la iteracion %d de g() con valor de y: %u\n", iteracion, y);
+}
+
+void f(int iteracion) {
+	unsigned int i, x;
+	unsigned int datos[TAMANO];
+
+	
+	for (i = 0; i < TAMANO; i++) datos[i] = 888;
+	//if (iteracion == LIMITE - 1)
+		//for (i = 0; i < 140; i++) printf("%x -> %x (%u)\n", &datos[i], datos[i], datos[i]);
+	if ((SALTAR == 1) && (iteracion == LIMITE - 1)) {
+		datos[POSICION] = datos[NUEVA_POS1];
+		datos[POSICION + 1] = datos[NUEVA_POS1 + 1];
+	}
+	else if ((SALTAR == 2) && (iteracion == LIMITE - 1)) {
+		datos[POSICION] = datos[NUEVA_POS2];
+		datos[POSICION + 1] = datos[NUEVA_POS2 + 1];
+	}
+	else if ((SALTAR == 3) && (iteracion == LIMITE - 1)) {
+		datos[POSICION] = datos[NUEVA_POS3];
+		datos[POSICION + 1] = h;
+	}
+	x = 666;
+	printf("Entrando en la iteracion %d de f() con valor de x: %u\n", iteracion, x);
+	g(iteracion);
+	printf("Saliendo de la iteracion %d de f() con valor de x: %u\n", iteracion, x);
+}
+
+int main(void) {
+	f(0);
+	return 0;
+}
+
+Mediante la macro SALTAR se indica a dónde se quiere ir desde la última iteración de f().
+Las direcciones de pila que debemos sustituir se han obtenido por el método de experimentación, empleando el
+código que está comentado y cuya función es imprimir la pila.
+
+La ejecución del programa sin realizar ningún salto (SALTAR = 0) tendría como resultado:
+
+Entrando en la iteracion 0 de f() con valor de x: 666
+Entrando en la iteracion 0 de g() con valor de y: 777
+Entrando en la iteracion 1 de f() con valor de x: 666
+Entrando en la iteracion 1 de g() con valor de y: 777
+Entrando en la iteracion 2 de f() con valor de x: 666
+Entrando en la iteracion 2 de g() con valor de y: 777
+Entrando en la iteracion 3 de f() con valor de x: 666
+Entrando en la iteracion 3 de g() con valor de y: 777
+Entrando en la iteracion 4 de f() con valor de x: 666
+Entrando en la iteracion 4 de g() con valor de y: 777
+Entrando en la iteracion 5 de f() con valor de x: 666
+Entrando en la iteracion 5 de g() con valor de y: 777
+Entrando en la iteracion 6 de f() con valor de x: 666
+Entrando en la iteracion 6 de g() con valor de y: 777
+Entrando en la iteracion 7 de f() con valor de x: 666
+Entrando en la iteracion 7 de g() con valor de y: 777
+Entrando en la iteracion 8 de f() con valor de x: 666
+Entrando en la iteracion 8 de g() con valor de y: 777
+Entrando en la iteracion 9 de f() con valor de x: 666
+Entrando en la iteracion 9 de g() con valor de y: 777
+Entrando en la iteracion 10 de f() con valor de x: 666
+Entrando en la iteracion 10 de g() con valor de y: 777
+Saliendo de la iteracion 10 de g() con valor de y: 777
+Saliendo de la iteracion 10 de f() con valor de x: 666
+Saliendo de la iteracion 9 de g() con valor de x: 777
+Saliendo de la iteracion 9 de f() con valor de x: 666
+Saliendo de la iteracion 8 de g() con valor de x: 777
+Saliendo de la iteracion 8 de f() con valor de x: 666
+Saliendo de la iteracion 7 de g() con valor de x: 777
+Saliendo de la iteracion 7 de f() con valor de x: 666
+Saliendo de la iteracion 6 de g() con valor de x: 777
+Saliendo de la iteracion 6 de f() con valor de x: 666
+Saliendo de la iteracion 5 de g() con valor de x: 777
+Saliendo de la iteracion 5 de f() con valor de x: 666
+Saliendo de la iteracion 4 de g() con valor de x: 777
+Saliendo de la iteracion 4 de f() con valor de x: 666
+Saliendo de la iteracion 3 de g() con valor de x: 777
+Saliendo de la iteracion 3 de f() con valor de x: 666
+Saliendo de la iteracion 2 de g() con valor de x: 777
+Saliendo de la iteracion 2 de f() con valor de x: 666
+Saliendo de la iteracion 1 de g() con valor de x: 777
+Saliendo de la iteracion 1 de f() con valor de x: 666
+Saliendo de la iteracion 0 de g() con valor de x: 777
+Saliendo de la iteracion 0 de f() con valor de x: 666
+
+La ejecución del programa con un salto a una dirección de retorno de f (SALTAR = 1) devuelve:
+
+Entrando en la iteracion 0 de f() con valor de x: 666
+Entrando en la iteracion 0 de g() con valor de y: 777
+Entrando en la iteracion 1 de f() con valor de x: 666
+Entrando en la iteracion 1 de g() con valor de y: 777
+Entrando en la iteracion 2 de f() con valor de x: 666
+Entrando en la iteracion 2 de g() con valor de y: 777
+Entrando en la iteracion 3 de f() con valor de x: 666
+Entrando en la iteracion 3 de g() con valor de y: 777
+Entrando en la iteracion 4 de f() con valor de x: 666
+Entrando en la iteracion 4 de g() con valor de y: 777
+Entrando en la iteracion 5 de f() con valor de x: 666
+Entrando en la iteracion 5 de g() con valor de y: 777
+Entrando en la iteracion 6 de f() con valor de x: 666
+Entrando en la iteracion 6 de g() con valor de y: 777
+Entrando en la iteracion 7 de f() con valor de x: 666
+Entrando en la iteracion 7 de g() con valor de y: 777
+Entrando en la iteracion 8 de f() con valor de x: 666
+Entrando en la iteracion 8 de g() con valor de y: 777
+Entrando en la iteracion 9 de f() con valor de x: 666
+Entrando en la iteracion 9 de g() con valor de y: 777
+Entrando en la iteracion 10 de f() con valor de x: 666
+Entrando en la iteracion 10 de g() con valor de y: 777
+Saliendo de la iteracion 10 de g() con valor de y: 777
+Saliendo de la iteracion 10 de f() con valor de x: 666
+Saliendo de la iteracion 4 de g() con valor de y: 777
+Saliendo de la iteracion 4 de f() con valor de x: 666
+Saliendo de la iteracion 3 de g() con valor de y: 777
+Saliendo de la iteracion 3 de f() con valor de x: 666
+Saliendo de la iteracion 2 de g() con valor de y: 777
+Saliendo de la iteracion 2 de f() con valor de x: 666
+Saliendo de la iteracion 1 de g() con valor de y: 777
+Saliendo de la iteracion 1 de f() con valor de x: 666
+Saliendo de la iteracion 0 de g() con valor de y: 777
+Saliendo de la iteracion 0 de f() con valor de x: 666
+
+Lo que ha ocurrido en este caso es que hemos modificado la dirección de retorno de la función f() en una cierta
+iteración (en este caso 10), sustituyéndola por la de una iteración anterior (4). De esta manera f() vuelve a una
+invocación de g(), lo cual nos puede parecer correcto. Sin embargo vuelve a una iteración muy anterior, con lo que
+nos hemos saltado varias instrucciones. También se ha modificado el punetro al frame anterior por el que tendría la
+función de la iteración por la cual nos hemos cambiado (es decir, el puntero al frame anterior de f() en la
+iteración 10 toma el valor del de f() en la iteración 4). Con esto se logra la ilusión de que todos los frames que
+quedan por el medio no existen, aunque en realidad estén ahí.
+
+La ejecución del programa con un salto a una dirección de retorno de g (SALTAR = 2) devuelve:
+
+Entrando en la iteracion 0 de f() con valor de x: 666
+Entrando en la iteracion 0 de g() con valor de y: 777
+Entrando en la iteracion 1 de f() con valor de x: 666
+Entrando en la iteracion 1 de g() con valor de y: 777
+Entrando en la iteracion 2 de f() con valor de x: 666
+Entrando en la iteracion 2 de g() con valor de y: 777
+Entrando en la iteracion 3 de f() con valor de x: 666
+Entrando en la iteracion 3 de g() con valor de y: 777
+Entrando en la iteracion 4 de f() con valor de x: 666
+Entrando en la iteracion 4 de g() con valor de y: 777
+Entrando en la iteracion 5 de f() con valor de x: 666
+Entrando en la iteracion 5 de g() con valor de y: 777
+Entrando en la iteracion 6 de f() con valor de x: 666
+Entrando en la iteracion 6 de g() con valor de y: 777
+Entrando en la iteracion 7 de f() con valor de x: 666
+Entrando en la iteracion 7 de g() con valor de y: 777
+Entrando en la iteracion 8 de f() con valor de x: 666
+Entrando en la iteracion 8 de g() con valor de y: 777
+Entrando en la iteracion 9 de f() con valor de x: 666
+Entrando en la iteracion 9 de g() con valor de y: 777
+Entrando en la iteracion 10 de f() con valor de x: 666
+Entrando en la iteracion 10 de g() con valor de y: 777
+Saliendo de la iteracion 10 de g() con valor de y: 777
+Saliendo de la iteracion 10 de f() con valor de x: 666
+Saliendo de la iteracion 4 de f() con valor de x: 666
+Saliendo de la iteracion 3 de g() con valor de y: 777
+Saliendo de la iteracion 3 de f() con valor de x: 666
+Saliendo de la iteracion 2 de g() con valor de y: 777
+Saliendo de la iteracion 2 de f() con valor de x: 666
+Saliendo de la iteracion 1 de g() con valor de y: 777
+Saliendo de la iteracion 1 de f() con valor de x: 666
+Saliendo de la iteracion 0 de g() con valor de y: 777
+Saliendo de la iteracion 0 de f() con valor de x: 666
+
+Lo que ha ocurrido en este caso es que hemos modificado la dirección de retorno de la función f() en una cierta
+iteración (en este caso 10), sustituyéndola por la de una iteración anterior (4), pero además de g(). De esta manera
+f() vuelve a una invocación anterior de f(), lo cual ya no puede parecer correcto al usuario si estuviésemos atacando
+su ordenador. Sin embargo vuelve a una iteración muy anterior, con lo que nos hemos saltado varias instrucciones.
+También se ha modificado el punetro al frame anterior por el que tendría la función de la iteración por la cual nos
+hemos cambiado (es decir, el puntero al frame anterior de f() en la iteración 10 toma el valor del de g() en la
+iteración 4). Con esto se logra la ilusión de que todos los frames que quedan por el medio no existen, aunque en
+realidad estén ahí.
+
+La ejecución del programa con un salto a una dirección de código no usado (SALTAR = 3) devuelve:
+
+Entrando en la iteracion 0 de f() con valor de x: 666
+Entrando en la iteracion 0 de g() con valor de y: 777
+Entrando en la iteracion 1 de f() con valor de x: 666
+Entrando en la iteracion 1 de g() con valor de y: 777
+Entrando en la iteracion 2 de f() con valor de x: 666
+Entrando en la iteracion 2 de g() con valor de y: 777
+Entrando en la iteracion 3 de f() con valor de x: 666
+Entrando en la iteracion 3 de g() con valor de y: 777
+Entrando en la iteracion 4 de f() con valor de x: 666
+Entrando en la iteracion 4 de g() con valor de y: 777
+Entrando en la iteracion 5 de f() con valor de x: 666
+Entrando en la iteracion 5 de g() con valor de y: 777
+Entrando en la iteracion 6 de f() con valor de x: 666
+Entrando en la iteracion 6 de g() con valor de y: 777
+Entrando en la iteracion 7 de f() con valor de x: 666
+Entrando en la iteracion 7 de g() con valor de y: 777
+Entrando en la iteracion 8 de f() con valor de x: 666
+Entrando en la iteracion 8 de g() con valor de y: 777
+Entrando en la iteracion 9 de f() con valor de x: 666
+Entrando en la iteracion 9 de g() con valor de y: 777
+Entrando en la iteracion 10 de f() con valor de x: 666
+Entrando en la iteracion 10 de g() con valor de y: 777
+Saliendo de la iteracion 10 de g() con valor de y: 777
+Saliendo de la iteracion 10 de f() con valor de x: 666
+Hola Mundo
+
+En este caso la dirección de retorno de f en la iteración 10 es sustituída por una dirección de código de una función
+llamada h() que no se usa durante el programa. El código de h() consiste en imprimir "Hola Mundo" y salir. El puntero
+del frame anterior se modifica por el de f() cuando vuelve de la iteración 0 de forma que se simula que todos los
+frames que quedan por el medio no existen. 

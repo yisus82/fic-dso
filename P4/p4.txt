@@ -1,0 +1,1218 @@
+/*******************************************************/
+/*******************************************************/
+/***************** PRACTICA DE DSO *********************/
+/*******************************************************/
+/****************** REALIZADA POR: *********************/
+/*******************************************************/
+/*********** Jesus Angel Perez-Roca Fernandez **********/
+/**************** (infjpf02) ***************************/
+/*******************************************************/
+/*******************************************************/
+
+
+OBJETIVO DE LA PRACTICA
+=======================
+
+El objetivo de esta practica es modificar un device driver. Para ello vamos a hacer que, al abrir el fichero
+especial asociado al device driver que modificamos, se imprima un mensaje por medio de la funcion printk. 
+Esta practica se realizo sobre Mandrake 10.0 con kernel-2.3.6-4mdk instalado.
+
+Lo primero que debemos hacer es buscar un dispositivo que tenga un numero major definido, para facilitarnos
+asi la tarea de crear el fichero normal asociado. Para saber que device drivers tienen un numero major definido
+buscamos en el fichero major.h situado en '/usr/include/linux'. El contenido de este fichero se encuentra al 
+final de esta memoria.
+
+Ahora tenemos que mirar un device driver de los que estan en ese fichero que tenga una funcion de abrir 
+dispositivo y que preferiblemente no este cargado. Nos fijamos en que el device driver de la impresora (lp) 
+cumple las caracteristicas anteriores, por lo que procedemos a insertar un printk en la funcion lp_open.
+
+A continuacion, compilamos el driver con 'make V=1 modules". De esta forma se activa el verbose y podemos ver
+como son los comandos que harian falta para compilar y linkar el fichero modificado.
+
+Lo que deberiamos poner para compilarlo seria lo siguiente:
+
+gcc -Wp,-MD,drivers/char/.lp.o.d -nostdinc -iwithprefix include -D__KERNEL__ -Iinclude  -D__KERNEL__ -Iinclude  -Wall -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -pipe -mpreferred-stack-boundary=2 -march=i586 -Iinclude/asm-i386/mach-default -O2    -DMODULE -DKBUILD_BASENAME=lp -DKBUILD_MODNAME=lp -c -o drivers/char/.tmp_lp.o drivers/char/lp.c
+
+Y para linkarlo, deberiamos poner:
+
+scripts/modpost vmlinux drivers/net/tokenring/3c359.o drivers/net/3c501.o drivers/net/3c503.o drivers/net/3c505.o drivers/net/3c507.o drivers/net/3c509.o drivers/net/3c515.o drivers/net/pcmcia/3c574_cs.o drivers/net/pcmcia/3c589_cs.o drivers/net/3c59x.o drivers/scsi/3w-xxxx.o drivers/scsi/53c700.o drivers/net/hamradio/6pack.o net/8021q/8021q.o drivers/net/8139cp.o drivers/net/8139too.o drivers/net/82596.o drivers/net/8390.o drivers/scsi/a100u2w.o drivers/input/joystick/a3d.o drivers/scsi/aacraid/aacraid.o drivers/net/tokenring/abyss.o drivers/net/ac3200.o sound/oss/ac97_codec.o sound/oss/ac97.o sound/oss/ac97_plugin_ad1980.o 3rdparty/acecad/acecad.o drivers/net/acenic.o sound/oss/aci.o drivers/acpi/ac.o arch/i386/kernel/cpu/cpufreq/acpi.o drivers/pci/hotplug/acpiphp.o drivers/char/watchdog/acquirewdt.o drivers/net/irda/act200l.o drivers/net/irda/act200l-sir.o drivers/net/irda/actisys.o drivers/net/irda/actisys-sir.o 3rdparty/acx100/acx100_pci.o sound/oss/ad1816.o sound/oss/ad1848.o sound/oss/ad1889.o fs/adfs/adfs.o drivers/input/joystick/adi.o sound/oss/adlib_card.o drivers/i2c/chips/adm1021.o drivers/media/video/adv7170.o drivers/media/video/adv7175.o 3rdparty/dxr3/adv717x.o drivers/scsi/advansys.o drivers/char/watchdog/advantechwdt.o drivers/ide/pci/aec62xx.o sound/oss/aedsp16.o crypto/aes.o fs/affs/affs.o net/ipmi/af_ipmi.o net/key/af_key.o net/packet/af_packet.o drivers/char/agp/agpgart.o net/ipv4/ah4.o net/ipv6/ah6.o drivers/scsi/pcmcia/aha152x_cs.o drivers/scsi/aha152x.o drivers/scsi/aha1542.o drivers/scsi/aha1740.o drivers/scsi/aic7xxx/aic79xx.o drivers/scsi/aic7xxx/aic7xxx.o drivers/scsi/aic7xxx_old.o drivers/usb/input/aiptek.o drivers/net/wireless/airo_cs.o drivers/net/wireless/airo.o sound/oss/ali5455.o drivers/char/agp/ali-agp.o drivers/net/irda/ali-ircc.o drivers/char/watchdog/alim1535_wdt.o drivers/char/watchdog/alim7101_wdt.o drivers/media/dvb/frontends/alps_tdlb7.o drivers/media/dvb/frontends/alps_tdmb7.o drivers/atm/ambassador.o drivers/char/agp/amd64-agp.o drivers/mtd/maps/amd76xrom.o drivers/char/watchdog/amd7xx_tco.o drivers/char/agp/amd-k7-agp.o drivers/ieee1394/amdtp.o drivers/input/joystick/analog.o net/appletalk/appletalk.o drivers/char/applicom.o drivers/net/arcnet/arcnet.o drivers/net/arcnet/arc-rawmode.o drivers/net/arcnet/arc-rimi.o drivers/net/wireless/arlan.o net/ipv4/netfilter/arptable_filter.o net/ipv4/netfilter/arp_tables.o net/ipv4/netfilter/arpt_mangle.o drivers/i2c/chips/asb100.o drivers/acpi/asus_acpi.o drivers/net/at1700.o 3rdparty/at76c503a/at76c503-i3861.o 3rdparty/at76c503a/at76c503-i3863.o 3rdparty/at76c503a/at76c503.o 3rdparty/at76c503a/at76c503-rfmd-acc.o 3rdparty/at76c503a/at76c503-rfmd.o 3rdparty/at76c503a/at76c505-rfmd2958.o 3rdparty/at76c503a/at76c505-rfmd.o drivers/media/dvb/frontends/at76c651.o drivers/scsi/ata_piix.o drivers/block/paride/aten.o drivers/char/agp/ati-agp.o drivers/net/wireless/atmel_cs.o drivers/net/wireless/atmel.o drivers/net/wireless/atmel_pci.o net/atm/atm.o drivers/atm/atmtcp.o drivers/scsi/atp870u.o drivers/net/atp.o drivers/video/aty/aty128fb.o drivers/video/aty/atyfb.o drivers/usb/class/audio.o drivers/usb/misc/auerswald.o net/sunrpc/auth_gss/auth_rpcgss.o fs/autofs4/autofs4.o drivers/isdn/hardware/avm/avm_cs.o sound/oss/awe_wave.o net/ax25/ax25.o drivers/net/pcmcia/axnet_cs.o drivers/cdrom/aztcd.o drivers/isdn/hardware/avm/b1dma.o drivers/isdn/hardware/avm/b1isa.o drivers/isdn/hardware/avm/b1.o drivers/isdn/hardware/avm/b1pci.o drivers/isdn/hardware/avm/b1pcmcia.o drivers/net/b44.o drivers/acpi/battery.o drivers/net/hamradio/baycom_epp.o drivers/net/hamradio/baycom_par.o drivers/net/hamradio/baycom_ser_fdx.o drivers/net/hamradio/baycom_ser_hdx.o drivers/bluetooth/bcm203x.o 3rdparty/bcm4400/bcm4400.o 3rdparty/bcm5700/bcm5700.o fs/befs/befs.o drivers/usb/serial/belkin_sa.o fs/bfs/bfs.o drivers/bluetooth/bfusb.o fs/binfmt_aout.o fs/binfmt_misc.o drivers/mtd/devices/blkmtd.o crypto/blowfish.o drivers/bluetooth/bluecard_cs.o net/bluetooth/bluetooth.o net/bluetooth/bnep/bnep.o drivers/net/bonding/bonding.o drivers/block/paride/bpck6.o drivers/block/paride/bpck.o drivers/net/hamradio/bpqether.o net/atm/br2684.o net/bridge/bridge.o drivers/usb/misc/brlvger.o drivers/net/bsd_comp.o drivers/bluetooth/bt3c_cs.o drivers/media/video/bt819.o drivers/media/video/bt856.o 3rdparty/dxr3/bt865.o drivers/media/dvb/bt8xx/bt878.o sound/oss/btaudio.o drivers/media/video/btcx-risc.o drivers/media/video/bttv.o drivers/bluetooth/btuart_cs.o drivers/media/dvb/ttpci/budget-av.o drivers/media/dvb/ttpci/budget-ci.o drivers/media/dvb/ttpci/budget-core.o drivers/media/dvb/ttpci/budget.o drivers/media/dvb/ttpci/budget-patch.o drivers/scsi/BusLogic.o drivers/acpi/button.o drivers/media/video/bw-qcam.o drivers/net/wan/c101.o drivers/isdn/hardware/avm/c4.o drivers/isdn/capi/capifs.o drivers/isdn/capi/capi.o crypto/cast5.o crypto/cast6.o drivers/usb/net/catc.o drivers/block/cciss.o drivers/usb/class/cdc-acm.o drivers/cdrom/cdrom.o drivers/cdrom/cdu31a.o drivers/mtd/chips/cfi_cmdset_0001.o drivers/mtd/chips/cfi_cmdset_0002.o drivers/mtd/chips/cfi_cmdset_0020.o drivers/mtd/chips/cfi_probe.o drivers/mtd/chips/chipreg.o fs/cifs/cifs.o net/atm/clip.o net/sched/cls_fw.o net/sched/cls_route.o net/sched/cls_rsvp6.o net/sched/cls_rsvp.o net/sched/cls_tcindex.o net/sched/cls_u32.o drivers/cdrom/cm206.o drivers/mtd/cmdlinepart.o sound/oss/cmpci.o drivers/ieee1394/cmp.o net/bluetooth/cmtp/cmtp.o drivers/input/joystick/cobra.o fs/coda/coda.o drivers/net/pcmcia/com20020_cs.o drivers/net/arcnet/com20020-isa.o drivers/net/arcnet/com20020.o drivers/net/arcnet/com20020-pci.o drivers/net/arcnet/com90io.o drivers/net/arcnet/com90xx.o drivers/block/paride/comm.o drivers/net/appletalk/cops.o drivers/net/wan/cosa.o drivers/pci/hotplug/cpcihp_generic.o drivers/pci/hotplug/cpcihp_zt5550.o drivers/media/video/cpia.o drivers/media/video/cpia_pp.o drivers/media/video/cpia_usb.o drivers/block/cpqarray.o drivers/scsi/cpqfc.o drivers/pci/hotplug/cpqphp.o drivers/char/watchdog/cpu5wdt.o drivers/cpufreq/cpufreq_powersave.o arch/i386/kernel/cpuid.o drivers/media/video/c-qcam.o fs/cramfs/cramfs.o drivers/block/cryptoloop.o crypto/crypto_null.o sound/oss/cs4232.o sound/oss/cs4281/cs4281.o sound/oss/cs46xx.o drivers/ide/pci/cs5520.o drivers/ide/pci/cs5530.o drivers/net/cs89x0.o drivers/input/serio/ct82c710.o drivers/media/dvb/frontends/cx24110.o drivers/media/video/cx88/cx8800.o drivers/media/video/cx88/cx88xx.o drivers/video/cyber2000fb.o drivers/usb/serial/cyberjack.o drivers/char/cyclades.o drivers/net/wan/cyclomx.o drivers/net/wan/cycx_drv.o drivers/usb/media/dabusb.o drivers/block/DAC960.o drivers/input/joystick/db9.o drivers/scsi/dc395x.o drivers/net/tulip/de2104x.o drivers/net/tulip/de4x5.o drivers/net/de600.o drivers/net/de620.o net/decnet/decnet.o crypto/deflate.o drivers/net/defxx.o drivers/net/depca.o crypto/des.o 3rdparty/dfg1394/dfg1394.o drivers/net/dgrs.o drivers/usb/serial/digi_acceleport.o drivers/mtd/maps/dilnetpc.o drivers/isdn/hardware/eicon/divacapi.o drivers/isdn/hardware/eicon/divadidd.o drivers/isdn/hardware/eicon/diva_idi.o drivers/isdn/hardware/eicon/diva_mnt.o drivers/isdn/hardware/eicon/divas.o 3rdparty/ogfs/divdi3/divdi3.o drivers/net/dl2k.o drivers/net/wan/dlci.o drivers/net/hamradio/dmascc.o drivers/net/tulip/dmfe.o drivers/md/dm-mod.o drivers/scsi/dmx3191d.o net/decnet/netfilter/dn_rtmsg.o drivers/mtd/devices/doc2000.o drivers/mtd/devices/doc2001.o drivers/mtd/devices/doc2001plus.o drivers/mtd/devices/docecc.o drivers/mtd/devices/docprobe.o drivers/net/irda/donauboe.o drivers/media/video/dpc7146.o drivers/usb/media/dsbr100.o drivers/pcmcia/ds.o drivers/media/dvb/frontends/dst.o drivers/block/paride/dstr.o drivers/scsi/dtc.o drivers/bluetooth/dtl1_cs.o drivers/char/dtlk.o drivers/net/dummy.o drivers/ieee1394/dv1394.o drivers/media/dvb/bt8xx/dvb-bt8xx.o drivers/media/dvb/dvb-core/dvb-core.o drivers/media/dvb/ttpci/dvb-ttpci.o drivers/media/dvb/ttusb-budget/dvb-ttusb-budget.o drivers/net/e1000/e1000.o drivers/net/e100/e100.o drivers/net/e2100.o 3rdparty/eagle-usb/eagle-usb.o drivers/scsi/eata.o drivers/scsi/eata_pio.o net/bridge/netfilter/ebt_802_3.o net/bridge/netfilter/ebtable_broute.o net/bridge/netfilter/ebtable_filter.o net/bridge/netfilter/ebtable_nat.o net/bridge/netfilter/ebtables.o net/bridge/netfilter/ebt_among.o net/bridge/netfilter/ebt_arp.o net/bridge/netfilter/ebt_arpreply.o net/bridge/netfilter/ebt_dnat.o net/bridge/netfilter/ebt_ip.o net/bridge/netfilter/ebt_limit.o net/bridge/netfilter/ebt_log.o net/bridge/netfilter/ebt_mark_m.o net/bridge/netfilter/ebt_mark.o net/bridge/netfilter/ebt_pkttype.o net/bridge/netfilter/ebt_redirect.o net/bridge/netfilter/ebt_snat.o net/bridge/netfilter/ebt_stp.o net/bridge/netfilter/ebt_vlan.o net/econet/econet.o drivers/net/eepro100.o drivers/i2c/chips/eeprom.o drivers/net/eepro.o drivers/net/eexpress.o fs/efs/efs.o drivers/usb/host/ehci-hcd.o 3rdparty/dxr3/em8300.o drivers/usb/misc/emi26.o drivers/usb/misc/emi62.o drivers/usb/serial/empeg.o drivers/input/gameport/emu10k1-gp.o sound/oss/emu10k1/emu10k1.o drivers/atm/eni.o drivers/block/paride/epat.o drivers/char/epca.o drivers/block/paride/epia.o drivers/net/epic100.o drivers/scsi/epsa2.o drivers/scsi/epst.o drivers/net/eql.o sound/oss/es1370.o sound/oss/es1371.o drivers/net/es3210.o drivers/net/irda/esi.o drivers/net/irda/esi-sir.o net/ipv4/esp4.o net/ipv6/esp6.o drivers/char/esp.o sound/oss/esssolo1.o drivers/ieee1394/eth1394.o drivers/net/eth16i.o drivers/net/ethertap.o drivers/char/watchdog/eurotechwdt.o drivers/input/evdev.o drivers/net/ewrk3.o fs/exportfs/exportfs.o fs/ext3/ext3.o drivers/pci/hotplug/fakephp.o drivers/acpi/fan.o drivers/net/wan/farsync.o fs/fat/fat.o drivers/scsi/pcmcia/fdomain_cs.o drivers/scsi/fdomain.o drivers/net/fealnx.o drivers/atm/firestream.o drivers/base/firmware_class.o drivers/block/paride/fit2.o drivers/block/paride/fit3.o drivers/block/floppy.o drivers/input/gameport/fm801-gp.o drivers/net/pcmcia/fmvj18x_cs.o drivers/net/forcedeth.o drivers/atm/fore_200e.o sound/oss/forte.o fs/freevxfs/freevxfs.o drivers/block/paride/friq.o drivers/block/paride/frpw.o drivers/i2c/chips/fscher.o drivers/char/ftape/lowlevel/ftape.o drivers/usb/serial/ftdi_sio.o drivers/mtd/ftl.o 3rdparty/fuse/fuse.o drivers/video/matrox/g450_pll.o drivers/usb/gadget/gadgetfs.o drivers/input/joystick/gamecon.o drivers/input/gameport/gameport.o drivers/char/drm/gamma.o drivers/scsi/gdth.o drivers/char/generic_serial.o drivers/mtd/chips/gen_probe.o drivers/char/genrtc.o drivers/usb/gadget/g_ether.o drivers/input/joystick/gf2k.o drivers/usb/gadget/g_file_storage.o drivers/net/irda/girbil.o drivers/net/irda/girbil-sir.o drivers/i2c/chips/gl518sm.o drivers/scsi/g_NCR5380_mmio.o drivers/scsi/g_NCR5380.o drivers/input/joystick/grip.o drivers/input/joystick/grip_mp.o drivers/media/dvb/frontends/grundig_29504-401.o drivers/media/dvb/frontends/grundig_29504-491.o drivers/cdrom/gscd.o drivers/usb/gadget/g_serial.o drivers/input/joystick/guillemot.o drivers/input/touchscreen/gunze.o sound/oss/gus.o arch/i386/kernel/cpu/cpufreq/gx-suspmod.o drivers/usb/gadget/g_zero.o drivers/net/hamachi.o drivers/char/hangcheck-timer.o 3rdparty/ogfs/harness/harness.o drivers/bluetooth/hci_uart.o drivers/bluetooth/hci_usb.o drivers/bluetooth/hci_vhci.o drivers/net/hamradio/hdlcdrv.o drivers/net/wan/hdlc.o drivers/atm/he.o drivers/net/wireless/hermes.o drivers/media/video/hexium_gemini.o drivers/media/video/hexium_orion.o fs/hfs/hfs.o 3rdparty/hfsplus-fs/hfsplus.o drivers/video/hgafb.o drivers/usb/input/hid.o drivers/atm/horizon.o 3rdparty/hostap/hostap_crypt_wep.o 3rdparty/hostap/hostap_cs.o 3rdparty/hostap/hostap.o 3rdparty/hostap/hostap_pci.o 3rdparty/hostap/hostap_plx.o drivers/net/wan/hostess_sv11.o drivers/net/hp100.o fs/hpfs/hpfs.o drivers/net/hp.o drivers/net/hp-plus.o drivers/usb/image/hpusbscsi.o drivers/char/hw_random.o drivers/i2c/algos/i2c-algo-bit.o drivers/i2c/algos/i2c-algo-pcf.o drivers/i2c/busses/i2c-ali1535.o drivers/i2c/busses/i2c-ali15x3.o drivers/i2c/busses/i2c-amd756.o drivers/i2c/busses/i2c-amd8111.o drivers/i2c/i2c-core.o 3rdparty/video-rivatv/i2c-detect.o drivers/i2c/i2c-dev.o drivers/i2c/busses/i2c-elektor.o drivers/i2c/busses/i2c-elv.o drivers/i2c/busses/i2c-i801.o drivers/i2c/busses/i2c-i810.o drivers/i2c/busses/i2c-isa.o drivers/video/matrox/i2c-matroxfb.o drivers/i2c/busses/i2c-nforce2.o drivers/i2c/busses/i2c-parport-light.o drivers/i2c/busses/i2c-parport.o drivers/i2c/busses/i2c-philips-par.o drivers/i2c/busses/i2c-piix4.o drivers/i2c/busses/i2c-prosavage.o drivers/i2c/busses/i2c-savage4.o drivers/i2c/i2c-sensor.o drivers/i2c/busses/i2c-sis5595.o drivers/i2c/busses/i2c-sis630.o drivers/i2c/busses/i2c-sis96x.o drivers/i2c/busses/i2c-velleman.o drivers/i2c/busses/i2c-via.o drivers/i2c/busses/i2c-viapro.o drivers/i2c/busses/i2c-voodoo3.o drivers/message/i2o/i2o_block.o drivers/message/i2o/i2o_config.o drivers/message/i2o/i2o_core.o drivers/message/i2o/i2o_proc.o drivers/message/i2o/i2o_scsi.o 3rdparty/mod_marvel/i33.o sound/oss/i810_audio.o drivers/video/i810/i810fb.o drivers/char/drm/i810.o drivers/pcmcia/i82092.o drivers/pcmcia/i82365.o drivers/char/drm/i830.o drivers/char/i8k.o drivers/char/watchdog/i8xx_tco.o drivers/char/watchdog/ib700wdt.o drivers/usb/media/ibmcam.o drivers/pci/hotplug/ibmphp.o drivers/net/pcmcia/ibmtr_cs.o drivers/net/tokenring/ibmtr.o drivers/ide/ide-cd.o drivers/ide/legacy/ide-cs.o drivers/ide/ide-floppy.o drivers/ide/ide-generic.o drivers/scsi/ide-scsi.o drivers/ide/ide-tape.o drivers/atm/idt77105.o drivers/atm/idt77252.o drivers/ieee1394/ieee1394.o drivers/input/joystick/iforce/iforce.o drivers/scsi/imm.o drivers/scsi/in2000.o drivers/mtd/inftl.o drivers/input/mouse/inport.o drivers/char/agp/intel-agp.o drivers/input/joystick/interact.o fs/intermezzo/intermezzo.o drivers/usb/serial/io_edgeport.o drivers/usb/serial/io_ti.o drivers/char/ip2main.o drivers/char/ip2.o net/ipv6/netfilter/ip6_queue.o net/ipv6/netfilter/ip6table_filter.o net/ipv6/netfilter/ip6table_mangle.o net/ipv6/netfilter/ip6_tables.o net/ipv6/netfilter/ip6t_ah.o net/ipv6/netfilter/ip6t_dst.o net/ipv6/netfilter/ip6t_esp.o net/ipv6/netfilter/ip6t_eui64.o net/ipv6/netfilter/ip6t_frag.o net/ipv6/netfilter/ip6t_hbh.o net/ipv6/netfilter/ip6t_hl.o net/ipv6/netfilter/ip6t_ipv6header.o net/ipv6/netfilter/ip6t_length.o net/ipv6/netfilter/ip6t_limit.o net/ipv6/netfilter/ip6t_LOG.o net/ipv6/netfilter/ip6t_mac.o net/ipv6/netfilter/ip6t_mark.o net/ipv6/netfilter/ip6t_MARK.o net/ipv6/netfilter/ip6t_multiport.o net/ipv6/netfilter/ip6t_owner.o net/ipv6/netfilter/ip6t_rt.o net/ipv6/ip6_tunnel.o drivers/usb/serial/ipaq.o net/ipv4/netfilter/ipchains.o net/ipv6/ipcomp6.o net/ipv4/ipcomp.o net/ipv4/netfilter/ip_conntrack_amanda.o net/ipv4/netfilter/ip_conntrack_ftp.o net/ipv4/netfilter/ip_conntrack_irc.o net/ipv4/netfilter/ip_conntrack.o net/ipv4/netfilter/ip_conntrack_rtsp.o net/ipv4/netfilter/ip_conntrack_tftp.o drivers/net/appletalk/ipddp.o net/ipv4/netfilter/ipfwadm.o net/ipv4/ip_gre.o drivers/atm/iphase.o net/ipv4/ipip.o drivers/char/ipmi/ipmi_devintf.o drivers/char/ipmi/ipmi_kcs_drv.o drivers/char/ipmi/ipmi_msghandler.o drivers/char/ipmi/ipmi_si_drv.o drivers/char/ipmi/ipmi_smb_intf.o drivers/char/ipmi/ipmi_watchdog.o net/ipv4/netfilter/ip_nat_amanda.o net/ipv4/netfilter/ip_nat_ftp.o net/ipv4/netfilter/ip_nat_irc.o net/ipv4/netfilter/ip_nat_rtsp.o net/ipv4/netfilter/ip_nat_snmp_basic.o net/ipv4/netfilter/ip_nat_tftp.o net/ipv4/netfilter/ip_queue.o drivers/scsi/ips.o net/ipv4/netfilter/iptable_filter.o net/ipv4/netfilter/iptable_mangle.o net/ipv4/netfilter/iptable_nat.o net/ipv4/netfilter/ip_tables.o net/ipv4/netfilter/ipt_ah.o net/ipv4/netfilter/ipt_CLASSIFY.o net/ipv4/netfilter/ipt_conntrack.o net/ipv4/netfilter/ipt_dscp.o net/ipv4/netfilter/ipt_DSCP.o net/ipv4/netfilter/ipt_ecn.o net/ipv4/netfilter/ipt_ECN.o net/ipv4/netfilter/ipt_esp.o net/ipv4/netfilter/ipt_helper.o net/ipv4/netfilter/ipt_iprange.o net/ipv4/netfilter/ipt_length.o net/ipv4/netfilter/ipt_limit.o net/ipv4/netfilter/ipt_LOG.o net/ipv4/netfilter/ipt_mac.o net/ipv4/netfilter/ipt_mark.o net/ipv4/netfilter/ipt_MARK.o net/ipv4/netfilter/ipt_MASQUERADE.o net/ipv4/netfilter/ipt_multiport.o net/ipv4/netfilter/ipt_NETMAP.o net/ipv4/netfilter/ipt_owner.o net/ipv4/netfilter/ipt_physdev.o net/ipv4/netfilter/ipt_pkttype.o net/ipv4/netfilter/ipt_recent.o net/ipv4/netfilter/ipt_REDIRECT.o net/ipv4/netfilter/ipt_REJECT.o net/ipv4/netfilter/ipt_SAME.o net/ipv4/netfilter/ipt_state.o net/ipv4/netfilter/ipt_tcpmss.o net/ipv4/netfilter/ipt_TCPMSS.o net/ipv4/netfilter/ipt_tos.o net/ipv4/netfilter/ipt_TOS.o net/ipv4/netfilter/ipt_ttl.o net/ipv4/netfilter/ipt_ULOG.o net/ipv6/ipv6.o net/ipv4/ipvs/ip_vs_dh.o net/ipv4/ipvs/ip_vs_ftp.o net/ipv4/ipvs/ip_vs_lblc.o net/ipv4/ipvs/ip_vs_lblcr.o net/ipv4/ipvs/ip_vs_lc.o net/ipv4/ipvs/ip_vs.o net/ipv4/ipvs/ip_vs_nq.o net/ipv4/ipvs/ip_vs_rr.o net/ipv4/ipvs/ip_vs_sed.o net/ipv4/ipvs/ip_vs_sh.o net/ipv4/ipvs/ip_vs_wlc.o net/ipv4/ipvs/ip_vs_wrr.o net/ipx/ipx.o net/irda/ircomm/ircomm.o drivers/media/common/ir-common.o net/irda/ircomm/ircomm-tty.o net/irda/irda.o drivers/net/irda/irda-usb.o drivers/media/video/ir-kbd-gpio.o drivers/media/video/ir-kbd-i2c.o net/irda/irlan/irlan.o net/irda/irnet/irnet.o drivers/net/irda/irport.o drivers/net/irda/irtty-sir.o drivers/usb/serial/ir-usb.o 3rdparty/iscsi-mod/iscsi_mod.o drivers/message/fusion/isense.o drivers/char/isicom.o fs/isofs/isofs.o drivers/cdrom/isp16.o drivers/char/istallion.o drivers/i2c/chips/it87.o 3rdparty/ivtv/ivtv.o drivers/net/ixgb/ixgb.o drivers/telephony/ixj.o drivers/telephony/ixj_pcmcia.o fs/jbd/jbd.o drivers/mtd/chips/jedec_probe.o fs/jffs2/jffs2.o fs/jffs/jffs.o fs/jfs/jfs.o drivers/input/joydev.o fs/afs/kafs.o sound/oss/kahlua.o drivers/usb/net/kaweth.o drivers/block/paride/kbic.o drivers/usb/input/kbtab.o drivers/isdn/capi/kernelcapi.o drivers/usb/serial/keyspan.o drivers/usb/serial/keyspan_pda.o drivers/usb/serial/kl5kusb105.o drivers/usb/serial/kobil_sct.o drivers/usb/media/konicawc.o 3rdparty/mod_marvel/ks0127.o drivers/block/paride/ktti.o drivers/video/kyro/kyrofb.o net/bluetooth/l2cap.o drivers/atm/lanai.o drivers/net/lance.o drivers/net/tokenring/lanstreamer.o net/lapb/lapb.o net/atm/lec.o drivers/usb/misc/legousbtower.o drivers/scsi/libata.o drivers/input/gameport/lightning.o drivers/md/linear.o 3rdparty/lirc/lirc_atiusb.o 3rdparty/lirc/lirc_bt829.o 3rdparty/lirc/lirc_dev.o 3rdparty/lirc/lirc_gpio.o 3rdparty/lirc/lirc_i2c.o 3rdparty/lirc/lirc_it87.o 3rdparty/lirc/lirc_parallel.o 3rdparty/lirc/lirc_serial.o 3rdparty/lirc/lirc_sir.o drivers/net/irda/litelink.o drivers/net/irda/litelink-sir.o net/llc/llc2.o drivers/i2c/chips/lm75.o drivers/i2c/chips/lm78.o drivers/i2c/chips/lm83.o drivers/i2c/chips/lm85.o drivers/i2c/chips/lm90.o drivers/net/lne390.o 3rdparty/ogfs/memexp/lock_harness.o drivers/input/mouse/logibm.o arch/i386/kernel/cpu/cpufreq/longhaul.o arch/i386/kernel/cpu/cpufreq/longrun.o drivers/block/loop.o drivers/net/lp486e.o 3rdparty/lpfc/lpfcdd.o drivers/char/lp.o drivers/net/appletalk/ltpc.o 3rdparty/lufs/lufs.o drivers/net/irda/ma600.o drivers/net/irda/ma600-sir.o drivers/char/watchdog/machzwd.o sound/oss/mad16.o sound/oss/maestro3.o sound/oss/maestro.o drivers/input/joystick/magellan.o drivers/mtd/chips/map_absent.o 3rdparty/mod_marvel/marvel_zr36060.o drivers/video/matrox/matroxfb_accel.o drivers/video/matrox/matroxfb_base.o drivers/video/matrox/matroxfb_crtc2.o drivers/video/matrox/matroxfb_DAC1064.o drivers/video/matrox/matroxfb_g450.o drivers/video/matrox/matroxfb_maven.o drivers/video/matrox/matroxfb_misc.o drivers/video/matrox/matroxfb_Ti3026.o sound/oss/maui.o drivers/cdrom/mcd.o drivers/cdrom/mcdx.o drivers/net/irda/mcp2120.o drivers/net/irda/mcp2120-sir.o drivers/usb/serial/mct_u232.o crypto/md4.o crypto/md5.o drivers/video/console/mdacon.o drivers/usb/image/mdc800.o drivers/scsi/megaraid.o 3rdparty/ogfs/memexp/memexp.o drivers/media/video/meye.o 3rdparty/mod_marvel/mgacap.o 3rdparty/mod_marvel/mga_core.o 3rdparty/mod_marvel/mgajpg.o drivers/char/drm/mga.o 3rdparty/mod_marvel/mgavideo.o arch/i386/kernel/microcode.o drivers/usb/image/microtek.o drivers/net/mii.o fs/minix/minix.o drivers/media/radio/miropcm20.o drivers/media/radio/miropcm20-rds.o drivers/char/watchdog/mixcomwd.o drivers/net/hamradio/mkiss.o drivers/char/moxa.o net/atm/mpoa.o drivers/message/fusion/mptbase.o drivers/message/fusion/mptctl.o drivers/message/fusion/mptlan.o drivers/message/fusion/mptscsih.o sound/oss/mpu401.o fs/msdos/msdos.o sound/oss/msnd_classic.o sound/oss/msnd.o sound/oss/msnd_pinnacle.o drivers/media/video/msp3400.o arch/i386/kernel/msr.o drivers/media/dvb/frontends/mt312.o drivers/mtd/mtd_blkdevs.o drivers/mtd/mtdblock.o drivers/mtd/mtdblock_ro.o drivers/mtd/mtdchar.o drivers/mtd/mtdconcat.o drivers/mtd/mtdcore.o drivers/mtd/mtdpart.o drivers/mtd/devices/mtdram.o drivers/md/multipath.o drivers/char/mwave/mwave.o drivers/media/video/mxb.o drivers/char/mxser.o drivers/net/wan/n2.o drivers/mtd/nand/nand_ecc.o drivers/mtd/nand/nand_ids.o drivers/mtd/nand/nand.o drivers/net/natsemi.o drivers/block/nbd.o fs/ncpfs/ncpfs.o drivers/scsi/NCR53c406a.o 3rdparty/ndiswrapper/ndiswrapper.o drivers/net/ne2k-pci.o drivers/net/ne3210.o drivers/net/ne.o drivers/video/neofb.o drivers/usb/gadget/net2280.o net/netlink/netlink_dev.o net/netrom/netrom.o drivers/mtd/maps/netsc520.o drivers/mtd/maps/nettel.o drivers/net/wireless/netwave_cs.o drivers/input/keyboard/newtonkbd.o fs/nfsd/nfsd.o drivers/mtd/nftl.o drivers/char/n_hdlc.o drivers/net/ni5010.o drivers/net/ni52.o drivers/net/ni65.o drivers/atm/nicstar.o fs/nls/nls_cp1250.o fs/nls/nls_cp1251.o fs/nls/nls_cp1255.o fs/nls/nls_cp437.o fs/nls/nls_cp737.o fs/nls/nls_cp775.o fs/nls/nls_cp850.o fs/nls/nls_cp852.o fs/nls/nls_cp855.o fs/nls/nls_cp857.o fs/nls/nls_cp860.o fs/nls/nls_cp861.o fs/nls/nls_cp862.o fs/nls/nls_cp863.o fs/nls/nls_cp864.o fs/nls/nls_cp865.o fs/nls/nls_cp866.o fs/nls/nls_cp869.o fs/nls/nls_cp874.o fs/nls/nls_cp932.o fs/nls/nls_cp936.o fs/nls/nls_cp949.o fs/nls/nls_cp950.o fs/nls/nls_euc-jp.o fs/nls/nls_iso8859-13.o fs/nls/nls_iso8859-14.o fs/nls/nls_iso8859-15.o fs/nls/nls_iso8859-1.o fs/nls/nls_iso8859-2.o fs/nls/nls_iso8859-3.o fs/nls/nls_iso8859-4.o fs/nls/nls_iso8859-5.o fs/nls/nls_iso8859-6.o fs/nls/nls_iso8859-7.o fs/nls/nls_iso8859-9.o fs/nls/nls_koi8-r.o fs/nls/nls_koi8-ru.o fs/nls/nls_koi8-u.o fs/nls/nls_utf8.o sound/oss/nm256_audio.o drivers/net/pcmcia/nmclan_cs.o drivers/char/n_r3964.o drivers/input/gameport/ns558.o drivers/net/ns83820.o drivers/net/irda/nsc-ircc.o drivers/scsi/nsp32.o drivers/scsi/pcmcia/nsp_cs.o fs/ntfs/ntfs.o drivers/char/agp/nvidia-agp.o drivers/char/nvram.o 3rdparty/ogfs/fs/ogfs.o drivers/ieee1394/ohci1394.o drivers/usb/host/ohci-hcd.o drivers/net/irda/old_belkin.o drivers/net/irda/old_belkin-sir.o drivers/net/tokenring/olympic.o drivers/usb/serial/omninet.o drivers/block/paride/on20.o drivers/block/paride/on26.o drivers/scsi/onscsi.o sound/oss/opl3.o sound/oss/opl3sa2.o sound/oss/opl3sa.o arch/i386/oprofile/oprofile.o drivers/cdrom/optcd.o drivers/net/wireless/orinoco_cs.o drivers/net/wireless/orinoco.o drivers/net/wireless/orinoco_pci.o drivers/net/wireless/orinoco_plx.o drivers/net/wireless/orinoco_tmd.o drivers/scsi/osst.o 3rdparty/ov511/ov511.o 3rdparty/ov511/ovcamchip.o 3rdparty/ov511/ovfx2.o arch/i386/kernel/cpu/cpufreq/p4-clockmod.o 3rdparty/prism25/p80211/p80211.o drivers/block/paride/paride.o drivers/input/serio/parkbd.o drivers/parport/parport_cs.o drivers/parport/parport.o drivers/parport/parport_pc.o drivers/parport/parport_serial.o drivers/scsi/pas16.o sound/oss/pas2.o drivers/input/mouse/pc110pad.o drivers/net/wan/pc300.o drivers/block/paride/pcd.o drivers/net/wan/pci200syn.o drivers/pci/hotplug/pci_hotplug.o drivers/ieee1394/pcilynx.o drivers/input/serio/pcips2.o drivers/pcmcia/pcmcia_core.o drivers/net/pcnet32.o drivers/net/pcmcia/pcnet_cs.o drivers/input/misc/pcspkr.o drivers/char/watchdog/pcwd.o drivers/char/watchdog/pcwd_pci.o drivers/block/paride/pd.o drivers/usb/net/pegasus.o drivers/block/paride/pf.o drivers/block/paride/pg.o drivers/telephony/phonedev.o drivers/mtd/maps/physmap.o net/core/pktgen.o drivers/usb/serial/pl2303.o drivers/net/plip.o drivers/mtd/devices/pmc551.o drivers/media/video/pms.o drivers/mtd/maps/pnc2000.o 3rdparty/poldhu/poldhu_cs.o drivers/usb/input/powermate.o arch/i386/kernel/cpu/cpufreq/powernow-k6.o arch/i386/kernel/cpu/cpufreq/powernow-k7.o arch/i386/kernel/cpu/cpufreq/powernow-k8.o drivers/scsi/ppa.o drivers/char/ppdev.o drivers/net/ppp_async.o drivers/net/ppp_deflate.o drivers/net/ppp_generic.o net/atm/pppoatm.o drivers/net/pppoe.o drivers/net/pppox.o drivers/net/ppp_synctty.o drivers/scsi/ppscsi.o 3rdparty/prism25/prism2_cs.o 3rdparty/prism25/prism2_pci.o 3rdparty/prism25/prism2_plx.o 3rdparty/prism25/prism2_usb.o 3rdparty/prism54/prism54.o drivers/acpi/processor.o drivers/net/tokenring/proteon.o drivers/scsi/psi240i.o sound/oss/pss.o drivers/block/paride/pt.o drivers/usb/media/pwc.o drivers/scsi/qla1280.o 3rdparty/scsi-qla2xxx/qla2100.o 3rdparty/scsi-qla2xxx/qla2200.o 3rdparty/scsi-qla2xxx/qla2300.o drivers/scsi/qla2xxx/qla2322.o 3rdparty/scsi-qla2xxx/qla2xxx.o drivers/scsi/qla2xxx/qla6312.o drivers/scsi/qla2xxx/qla6322.o drivers/scsi/pcmcia/qlogic_cs.o drivers/scsi/qlogicfas.o drivers/scsi/qlogicfc.o drivers/scsi/qlogicisp.o fs/qnx4/qnx4.o 3rdparty/qc-usb/quickcam.o fs/quota_v1.o drivers/char/drm/r128.o drivers/net/r8169.o drivers/video/aty/radeonfb.o drivers/char/drm/radeon.o drivers/media/radio/radio-aimslab.o drivers/media/radio/radio-aztech.o drivers/media/radio/radio-cadet.o drivers/media/radio/radio-gemtek.o drivers/media/radio/radio-gemtek-pci.o drivers/media/radio/radio-maestro.o drivers/media/radio/radio-maxiradio.o drivers/media/radio/radio-rtrack2.o drivers/media/radio/radio-sf16fmi.o drivers/media/radio/radio-terratec.o drivers/media/radio/radio-trust.o drivers/media/radio/radio-typhoon.o drivers/media/radio/radio-zoltrix.o drivers/md/raid0.o drivers/md/raid1.o drivers/md/raid5.o drivers/md/raid6.o drivers/ieee1394/raw1394.o drivers/char/raw.o drivers/net/wireless/ray_cs.o drivers/net/rcpci.o drivers/mtd/redboot.o fs/reiserfs/reiserfs.o drivers/net/arcnet/rfc1051.o drivers/net/arcnet/rfc1201.o net/bluetooth/rfcomm/rfcomm.o drivers/usb/misc/rio500.o drivers/char/rio/rio.o drivers/char/riscom8.o drivers/video/riva/rivafb.o 3rdparty/video-rivatv/rivatv.o sound/oss/rme96xx.o drivers/char/rocket.o fs/romfs/romfs.o net/rose/rose.o net/sunrpc/auth_gss/rpcsec_gss_krb5.o drivers/char/rtc.o drivers/usb/net/rtl8150.o net/rxrpc/rxrpc.o drivers/ide/pci/rz1000.o drivers/media/video/saa5249.o 3rdparty/video-rivatv/saa7108e.o drivers/media/video/saa7110.o 3rdparty/video-rivatv/saa7111a.o drivers/media/video/saa7111.o 3rdparty/ov511/saa7111-new.o 3rdparty/video-rivatv/saa7113h.o drivers/media/video/saa7114.o 3rdparty/ivtv/saa7115.o 3rdparty/ivtv/saa7127.o drivers/media/video/saa7134/saa7134.o drivers/media/common/saa7146.o drivers/media/common/saa7146_vv.o drivers/media/video/saa7185.o drivers/usb/serial/safe_serial.o drivers/scsi/sata_promise.o drivers/scsi/sata_svw.o drivers/scsi/sata_via.o drivers/net/sb1000.o drivers/char/watchdog/sbc60xxwdt.o sound/oss/sb_lib.o sound/oss/sb.o drivers/net/wan/sbni.o drivers/ieee1394/sbp2.o drivers/cdrom/sbpcd.o drivers/ide/pci/sc1200.o drivers/char/watchdog/sc1200wdt.o drivers/mtd/maps/sc520cdp.o drivers/char/watchdog/sc520_wdt.o drivers/mtd/maps/scb2_flash.o drivers/net/hamradio/scc.o net/sched/sch_cbq.o net/sched/sch_csz.o net/sched/sch_dsmark.o net/sched/sch_gred.o net/sched/sch_hfsc.o net/sched/sch_htb.o net/sched/sch_ingress.o net/sched/sch_prio.o net/sched/sch_red.o net/sched/sch_sfq.o net/sched/sch_tbf.o net/sched/sch_teql.o net/bluetooth/sco.o drivers/scsi/scsi_debug.o drivers/scsi/scsi_mod.o net/sctp/sctp.o drivers/i2c/busses/scx200_acb.o drivers/char/scx200_gpio.o drivers/i2c/busses/scx200_i2c.o arch/i386/kernel/scx200.o drivers/char/watchdog/scx200_wdt.o drivers/net/wan/sdla.o drivers/scsi/sd_mod.o drivers/usb/media/se401.o drivers/net/wan/sealevel.o drivers/net/seeq8005.o drivers/serial/serial_cs.o drivers/input/mouse/sermouse.o crypto/serpent.o drivers/input/serio/serport.o sound/oss/sgalaxy.o drivers/scsi/sg.o crypto/sha1.o crypto/sha256.o crypto/sha512.o drivers/net/shaper.o drivers/input/joystick/sidewinder.o drivers/scsi/sim710.o drivers/net/irda/sir-dev.o drivers/net/sis190.o drivers/net/sis900.o drivers/char/agp/sis-agp.o drivers/video/sis/sisfb.o drivers/char/drm/sis.o drivers/cdrom/sjcd.o drivers/net/sk98lin/sk98lin.o drivers/net/skfp/skfp.o drivers/net/tokenring/skisa.o drivers/media/dvb/b2c2/skystar2.o drivers/ide/pci/slc90e66.o drivers/net/slhc.o drivers/net/slip.o drivers/mtd/devices/slram.o fs/smbfs/smbfs.o drivers/net/smc9194.o drivers/net/pcmcia/smc91c92_cs.o drivers/net/tokenring/smctr.o drivers/net/smc-ultra32.o drivers/net/smc-ultra.o drivers/net/irda/smsc-ircc2.o sound/pci/ac97/snd-ac97-codec.o sound/isa/ad1816a/snd-ad1816a-lib.o sound/isa/ad1816a/snd-ad1816a.o sound/isa/ad1848/snd-ad1848-lib.o sound/isa/ad1848/snd-ad1848.o sound/core/seq/instr/snd-ainstr-fm.o sound/core/seq/instr/snd-ainstr-gf1.o sound/core/seq/instr/snd-ainstr-iw.o sound/core/seq/instr/snd-ainstr-simple.o sound/i2c/other/snd-ak4117.o sound/pci/ac97/snd-ak4531-codec.o sound/i2c/other/snd-ak4xxx-adda.o sound/pci/ali5451/snd-ali5451.o sound/isa/snd-als100.o sound/pci/snd-als4000.o sound/pci/au88x0/snd-au8810.o sound/pci/au88x0/snd-au8820.o sound/pci/au88x0/snd-au8830.o sound/isa/snd-azt2320.o sound/pci/snd-azt3328.o sound/pci/snd-bt87x.o sound/isa/snd-cmi8330.o sound/pci/snd-cmipci.o sound/isa/cs423x/snd-cs4231-lib.o sound/isa/cs423x/snd-cs4231.o sound/isa/cs423x/snd-cs4232.o sound/isa/cs423x/snd-cs4236-lib.o sound/isa/cs423x/snd-cs4236.o sound/pci/snd-cs4281.o sound/pci/cs46xx/snd-cs46xx.o sound/i2c/snd-cs8427.o sound/pci/echoaudio/snd-darla20.o sound/pci/echoaudio/snd-darla24.o sound/isa/snd-dt019x.o sound/drivers/snd-dummy.o sound/pci/emu10k1/snd-emu10k1.o sound/pci/emu10k1/snd-emu10k1-synth.o sound/isa/sb/snd-emu8000-synth.o sound/synth/emux/snd-emux-synth.o sound/pci/snd-ens1370.o sound/pci/snd-ens1371.o sound/isa/es1688/snd-es1688-lib.o sound/isa/es1688/snd-es1688.o sound/isa/snd-es18xx.o sound/pci/snd-es1938.o sound/pci/snd-es1968.o sound/isa/sb/snd-es968.o sound/pci/snd-fm801.o sound/pci/echoaudio/snd-gina20.o sound/pci/echoaudio/snd-gina24.o sound/isa/gus/snd-gusclassic.o sound/isa/gus/snd-gusextreme.o sound/isa/gus/snd-gus-lib.o sound/isa/gus/snd-gusmax.o sound/isa/gus/snd-gus-synth.o sound/pci/rme9652/snd-hdsp.o sound/core/snd-hwdep.o sound/i2c/snd-i2c.o sound/pci/ice1712/snd-ice1712.o sound/pci/ice1712/snd-ice1724.o sound/pci/ice1712/snd-ice17xx-ak4xxx.o sound/pci/snd-intel8x0.o sound/isa/gus/snd-interwave.o sound/isa/gus/snd-interwave-stb.o sound/pci/korg1212/snd-korg1212.o sound/pci/echoaudio/snd-layla24.o sound/pci/snd-maestro3.o sound/pci/echoaudio/snd-mia.o sound/pci/mixart/snd-mixart.o sound/core/oss/snd-mixer-oss.o sound/core/snd.o sound/drivers/mpu401/snd-mpu401.o sound/drivers/mpu401/snd-mpu401-uart.o sound/isa/msnd/snd-msnd-pinnacle.o sound/drivers/snd-mtpav.o sound/pci/nm256/snd-nm256.o sound/drivers/opl3/snd-opl3-lib.o sound/isa/snd-opl3sa2.o sound/drivers/opl3/snd-opl3-synth.o sound/drivers/opl4/snd-opl4-lib.o sound/drivers/opl4/snd-opl4-synth.o sound/isa/opti9xx/snd-opti92x-ad1848.o sound/isa/opti9xx/snd-opti92x-cs4231.o sound/isa/opti9xx/snd-opti93x.o sound/core/snd-page-alloc.o sound/core/snd-pcm.o sound/core/oss/snd-pcm-oss.o sound/pcmcia/pdaudiocf/snd-pdaudiocf.o sound/pci/pdplus/snd-pdplus.o sound/core/snd-rawmidi.o sound/pci/snd-rme32.o sound/pci/rme9652/snd-rme9652.o sound/pci/snd-rme96.o sound/core/snd-rtctimer.o sound/isa/sb/snd-sb16-csp.o sound/isa/sb/snd-sb16-dsp.o sound/isa/sb/snd-sb16.o sound/isa/sb/snd-sb8-dsp.o sound/isa/sb/snd-sb8.o sound/isa/sb/snd-sbawe.o sound/isa/sb/snd-sb-common.o sound/core/seq/snd-seq-device.o sound/core/seq/snd-seq-dummy.o sound/core/seq/snd-seq-instr.o sound/core/seq/snd-seq-midi-emul.o sound/core/seq/snd-seq-midi-event.o sound/core/seq/snd-seq-midi.o sound/core/seq/snd-seq.o sound/core/seq/oss/snd-seq-oss.o sound/core/seq/snd-seq-virmidi.o sound/drivers/snd-serial-u16550.o sound/isa/snd-sgalaxy.o sound/pci/snd-sonicvibes.o sound/isa/snd-sscape.o sound/i2c/snd-tea6330t.o sound/core/snd-timer.o sound/pci/trident/snd-trident.o sound/pci/trident/snd-trident-synth.o sound/usb/snd-usb-audio.o sound/usb/usx2y/snd-usb-usx2y.o sound/synth/snd-util-mem.o sound/pci/snd-via82xx.o sound/drivers/snd-virmidi.o sound/pci/vx222/snd-vx222.o sound/pcmcia/vx/snd-vx-cs.o sound/drivers/vx/snd-vx-lib.o sound/pcmcia/vx/snd-vxp440.o sound/pcmcia/vx/snd-vxpocket.o sound/isa/wavefront/snd-wavefront.o sound/pci/ymfpci/snd-ymfpci.o drivers/char/watchdog/softdog.o sound/oss/sonicvibes.o drivers/cdrom/sonycd535.o drivers/char/sonypi.o sound/soundcore.o sound/oss/sound.o drivers/media/dvb/frontends/sp887x.o drivers/input/joystick/spaceball.o drivers/input/joystick/spaceorb.o drivers/scsi/sparcsi.o drivers/char/specialix.o arch/i386/kernel/cpu/cpufreq/speedstep-centrino.o arch/i386/kernel/cpu/cpufreq/speedstep-ich.o arch/i386/kernel/cpu/cpufreq/speedstep-lib.o arch/i386/kernel/cpu/cpufreq/speedstep-smi.o drivers/usb/misc/speedtch.o fs/squashfs/squashfs.o drivers/scsi/sr_mod.o sound/oss/sscape.o drivers/video/sstfb.o drivers/char/stallion.o drivers/net/starfire.o drivers/input/joystick/stinger.o drivers/scsi/st.o drivers/media/video/stradis.o drivers/net/wireless/strip.o drivers/media/dvb/frontends/stv0299.o drivers/usb/media/stv680.o drivers/net/sundance.o drivers/net/sungem.o drivers/net/sungem_phy.o drivers/net/sunhme.o drivers/atm/suni.o drivers/input/keyboard/sunkbd.o fs/supermount/supermount.o 3rdparty/svgalib_helper/svgalib_helper.o drivers/char/agp/sworks-agp.o drivers/char/sx.o drivers/scsi/sym53c416.o drivers/scsi/sym53c8xx_2/sym53c8xx.o drivers/char/pcmcia/synclink_cs.o drivers/char/synclink.o drivers/char/synclinkmp.o drivers/net/wan/syncppp.o fs/sysv/sysv.o drivers/scsi/t128.o drivers/isdn/hardware/avm/t1isa.o drivers/isdn/hardware/avm/t1pci.o drivers/scsi/t348.o drivers/scsi/t358.o drivers/pcmcia/tcic.o crypto/tcrypt.o drivers/media/dvb/frontends/tda1004x.o 3rdparty/ov511/tda7313.o drivers/media/video/tda7432.o drivers/media/video/tda9840.o drivers/media/video/tda9875.o drivers/media/video/tda9887.o drivers/video/tdfxfb.o drivers/char/drm/tdfx.o drivers/media/video/tea6415c.o drivers/media/video/tea6420.o drivers/net/irda/tekram.o drivers/net/irda/tekram-sir.o drivers/net/tg3.o drivers/acpi/thermal.o drivers/usb/misc/tiglusb.o drivers/char/tipar.o drivers/net/tlan.o drivers/input/joystick/tmdc.o drivers/net/tokenring/tms380tr.o drivers/scsi/tmscsim.o drivers/net/tokenring/tmspci.o drivers/acpi/toshiba_acpi.o drivers/char/toshiba.o drivers/char/tpqic02.o drivers/video/tridentfb.o sound/oss/trident.o drivers/ide/pci/triflex.o sound/oss/trix.o drivers/ide/pci/trm290.o drivers/input/tsdev.o drivers/media/dvb/ttpci/ttpci-eeprom.o drivers/net/tulip/tulip.o drivers/media/video/tuner-3036.o drivers/media/video/tuner.o drivers/net/tun.o drivers/input/joystick/turbografx.o drivers/media/video/tvaudio.o 3rdparty/ivtv/tveeprom.o drivers/media/video/tvmixer.o 3rdparty/video-rivatv/tw98.o crypto/twofish.o drivers/net/typhoon.o drivers/scsi/u14-34f.o sound/oss/uart401.o sound/oss/uart6850.o fs/udf/udf.o fs/ufs/ufs.o drivers/usb/host/uhci-hcd.o drivers/input/misc/uinput.o drivers/usb/media/ultracam.o drivers/scsi/ultrastor.o drivers/block/umem.o drivers/atm/uPD98402.o drivers/usb/core/usbcore.o 3rdparty/at76c503a/usbdfu.o drivers/usb/input/usbkbd.o drivers/usb/misc/usblcd.o drivers/usb/misc/usbled.o drivers/usb/class/usblp.o drivers/usb/class/usb-midi.o drivers/usb/input/usbmouse.o drivers/usb/net/usbnet.o drivers/usb/serial/usbserial.o drivers/usb/storage/usb-storage.o drivers/usb/misc/usbtest.o drivers/usb/media/usbvideo.o drivers/usb/misc/uss720.o drivers/media/video/v4l1-compat.o drivers/media/video/v4l2-common.o drivers/media/dvb/frontends/ves1820.o drivers/media/dvb/frontends/ves1x93.o fs/vfat/vfat.o drivers/video/vfb.o drivers/video/vga16fb.o drivers/video/vgastate.o drivers/i2c/chips/via686a.o sound/oss/via82cxxx_audio.o drivers/char/agp/via-agp.o 3rdparty/viahss/viahss.o drivers/net/irda/via-ircc.o drivers/net/via-rhine.o drivers/usb/media/vicam.o drivers/ieee1394/video1394.o drivers/media/video/video-buf.o drivers/media/video/videocodec.o drivers/media/video/videodev.o drivers/usb/serial/visor.o drivers/net/irda/vlsi_ir.o sound/oss/v_midi.o drivers/input/gameport/vortex.o drivers/scsi/vpi0.o drivers/media/video/vpx3220.o 3rdparty/video-rivatv/vpx32xx.o 3rdparty/vt_ar5k/vt_ar5k.o drivers/char/watchdog/w83627hf_wdt.o drivers/i2c/chips/w83781d.o drivers/char/watchdog/w83877f_wdt.o drivers/net/irda/w83977af_ir.o drivers/i2c/chips/w83l785ts.o drivers/media/video/w9966.o 3rdparty/w9968cf/w9968cf.o 3rdparty/w9968cf/w9968cf-vpp.o drivers/usb/input/wacom.o drivers/char/watchdog/wafer5823wdt.o net/wanrouter/wanrouter.o drivers/net/wan/wanxl.o drivers/input/joystick/warrior.o sound/oss/wavefront.o drivers/net/wireless/wavelan_cs.o drivers/net/wireless/wavelan.o drivers/scsi/wd7000.o drivers/net/wd.o drivers/char/watchdog/wdt.o drivers/char/watchdog/wdt_pci.o drivers/usb/serial/whiteheat.o drivers/net/tulip/winbond-840.o drivers/net/wireless/wl3501_cs.o net/x25/x25.o drivers/block/xd.o net/xfrm/xfrm_user.o fs/xfs/xfs.o drivers/net/pcmcia/xirc2ps_cs.o drivers/net/tulip/xircom_cb.o drivers/net/tulip/xircom_tulip_cb.o drivers/md/xor.o drivers/usb/input/xpad.o drivers/input/keyboard/xtkbd.o drivers/net/hamradio/yam.o drivers/net/yellowfin.o drivers/pcmcia/yenta_socket.o sound/oss/ymfpci.o drivers/net/wan/z85230.o drivers/atm/zatm.o drivers/char/ftape/zftape/zftape.o drivers/char/ftape/compressor/zft-compressor.o lib/zlib_deflate/zlib_deflate.o lib/zlib_inflate/zlib_inflate.o drivers/net/znet.o drivers/media/video/zr36016.o drivers/media/video/zr36050.o drivers/media/video/zr36060.o drivers/media/video/zr36067.o
+  ld -m elf_i386 -r -o drivers/char/lp.ko drivers/char/lp.o drivers/char/lp.mod.o
+
+Ahora cargamos el driver con el comando 'insmod drivers/char/lp.ko' y comprobamos que se cargo perfectamente con el
+comando lsmod.
+
+Luego volvemos a nuestro directorio home y creamos un fichero especial de dispositivo de tipo caracter asociado
+a nuestro device driver. Para ello usamos el comando mknod al que le pasamos el nombre del fichero a crear, 
+el tipo de dispositivo (caracter) y los numeros major y minor que estaran asociados al dispositivo. 
+Asi­, ejecutariamos 'mknod lp c 6 0'.
+
+Ahora solo nos queda probar que funciona la modificacion, haciendo un programa que abra ese fichero. El programa 
+podria ser el siguiente:
+
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+main() {
+
+	open("./lp", O_RDONLY);
+
+}
+
+
+Tras compilar y ejecutar el programa, podemos comprobar que en efecto aparece un mensaje en '/var/log/messages'
+que dice:
+
+Feb 10 21:05:21 localhost kernel: Device driver de lp abierto
+
+Por ultimo solo nos queda descarga el device driver con el comando 'rmmod lp'.
+
+CODIGO MODIFICADO DE LP.C
+=========================
+
+/*
+ * Generic parallel printer driver
+ *
+ * Copyright (C) 1992 by Jim Weigand and Linus Torvalds
+ * Copyright (C) 1992,1993 by Michael K. Johnson
+ * - Thanks much to Gunter Windau for pointing out to me where the error
+ *   checking ought to be.
+ * Copyright (C) 1993 by Nigel Gamble (added interrupt code)
+ * Copyright (C) 1994 by Alan Cox (Modularised it)
+ * LPCAREFUL, LPABORT, LPGETSTATUS added by Chris Metcalf, metcalf@lcs.mit.edu
+ * Statistics and support for slow printers by Rob Janssen, rob@knoware.nl
+ * "lp=" command line parameters added by Grant Guenther, grant@torque.net
+ * lp_read (Status readback) support added by Carsten Gross,
+ *                                             carsten@sol.wohnheim.uni-ulm.de
+ * Support for parport by Philip Blundell <Philip.Blundell@pobox.com>
+ * Parport sharing hacking by Andrea Arcangeli
+ * Fixed kernel_(to/from)_user memory copy to check for errors
+ * 				by Riccardo Facchetti <fizban@tin.it>
+ * 22-JAN-1998  Added support for devfs  Richard Gooch <rgooch@atnf.csiro.au>
+ * Redesigned interrupt handling for handle printers with buggy handshake
+ *				by Andrea Arcangeli, 11 May 1998
+ * Full efficient handling of printer with buggy irq handshake (now I have
+ * understood the meaning of the strange handshake). This is done sending new
+ * characters if the interrupt is just happened, even if the printer say to
+ * be still BUSY. This is needed at least with Epson Stylus Color. To enable
+ * the new TRUST_IRQ mode read the `LP OPTIMIZATION' section below...
+ * Fixed the irq on the rising edge of the strobe case.
+ * Obsoleted the CAREFUL flag since a printer that doesn' t work with
+ * CAREFUL will block a bit after in lp_check_status().
+ *				Andrea Arcangeli, 15 Oct 1998
+ * Obsoleted and removed all the lowlevel stuff implemented in the last
+ * month to use the IEEE1284 functions (that handle the _new_ compatibilty
+ * mode fine).
+ */
+
+/* This driver should, in theory, work with any parallel port that has an
+ * appropriate low-level driver; all I/O is done through the parport
+ * abstraction layer.
+ *
+ * If this driver is built into the kernel, you can configure it using the
+ * kernel command-line.  For example:
+ *
+ *	lp=parport1,none,parport2	(bind lp0 to parport1, disable lp1 and
+ *					 bind lp2 to parport2)
+ *
+ *	lp=auto				(assign lp devices to all ports that
+ *				         have printers attached, as determined
+ *					 by the IEEE-1284 autoprobe)
+ * 
+ *	lp=reset			(reset the printer during 
+ *					 initialisation)
+ *
+ *	lp=off				(disable the printer driver entirely)
+ *
+ * If the driver is loaded as a module, similar functionality is available
+ * using module parameters.  The equivalent of the above commands would be:
+ *
+ *	# insmod lp.o parport=1,none,2
+ *
+ *	# insmod lp.o parport=auto
+ *
+ *	# insmod lp.o reset=1
+ */
+
+/* COMPATIBILITY WITH OLD KERNELS
+ *
+ * Under Linux 2.0 and previous versions, lp devices were bound to ports at
+ * particular I/O addresses, as follows:
+ *
+ *	lp0		0x3bc
+ *	lp1		0x378
+ *	lp2		0x278
+ *
+ * The new driver, by default, binds lp devices to parport devices as it
+ * finds them.  This means that if you only have one port, it will be bound
+ * to lp0 regardless of its I/O address.  If you need the old behaviour, you
+ * can force it using the parameters described above.
+ */
+
+/*
+ * The new interrupt handling code take care of the buggy handshake
+ * of some HP and Epson printer:
+ * ___
+ * ACK    _______________    ___________
+ *                       |__|
+ * ____
+ * BUSY   _________              _______
+ *                 |____________|
+ *
+ * I discovered this using the printer scanner that you can find at:
+ *
+ *	ftp://e-mind.com/pub/linux/pscan/
+ *
+ *					11 May 98, Andrea Arcangeli
+ *
+ * My printer scanner run on an Epson Stylus Color show that such printer
+ * generates the irq on the _rising_ edge of the STROBE. Now lp handle
+ * this case fine too.
+ *
+ *					15 Oct 1998, Andrea Arcangeli
+ *
+ * The so called `buggy' handshake is really the well documented
+ * compatibility mode IEEE1284 handshake. They changed the well known
+ * Centronics handshake acking in the middle of busy expecting to not
+ * break drivers or legacy application, while they broken linux lp
+ * until I fixed it reverse engineering the protocol by hand some
+ * month ago...
+ *
+ *                                     14 Dec 1998, Andrea Arcangeli
+ *
+ * Copyright (C) 2000 by Tim Waugh (added LPSETTIMEOUT ioctl)
+ */
+
+#include <linux/module.h>
+#include <linux/init.h>
+
+#include <linux/config.h>
+#include <linux/errno.h>
+#include <linux/kernel.h>
+#include <linux/major.h>
+#include <linux/sched.h>
+#include <linux/smp_lock.h>
+#include <linux/devfs_fs_kernel.h>
+#include <linux/slab.h>
+#include <linux/fcntl.h>
+#include <linux/delay.h>
+#include <linux/poll.h>
+#include <linux/console.h>
+#include <linux/device.h>
+
+#include <linux/parport.h>
+#undef LP_STATS
+#include <linux/lp.h>
+
+#include <asm/irq.h>
+#include <asm/uaccess.h>
+#include <asm/system.h>
+
+/* if you have more than 8 printers, remember to increase LP_NO */
+#define LP_NO 8
+
+/* ROUND_UP macro from fs/select.c */
+#define ROUND_UP(x,y) (((x)+(y)-1)/(y))
+
+struct lp_struct lp_table[LP_NO];
+
+static unsigned int lp_count = 0;
+static struct class_simple *lp_class;
+
+#ifdef CONFIG_LP_CONSOLE
+static struct parport *console_registered; // initially NULL
+#endif /* CONFIG_LP_CONSOLE */
+
+#undef LP_DEBUG
+
+/* Bits used to manage claiming the parport device */
+#define LP_PREEMPT_REQUEST 1
+#define LP_PARPORT_CLAIMED 2
+
+/* --- low-level port access ----------------------------------- */
+
+#define r_dtr(x)	(parport_read_data(lp_table[(x)].dev->port))
+#define r_str(x)	(parport_read_status(lp_table[(x)].dev->port))
+#define w_ctr(x,y)	do { parport_write_control(lp_table[(x)].dev->port, (y)); } while (0)
+#define w_dtr(x,y)	do { parport_write_data(lp_table[(x)].dev->port, (y)); } while (0)
+
+/* Claim the parport or block trying unless we've already claimed it */
+static void lp_claim_parport_or_block(struct lp_struct *this_lp)
+{
+	if (!test_and_set_bit(LP_PARPORT_CLAIMED, &this_lp->bits)) {
+		parport_claim_or_block (this_lp->dev);
+	}
+}
+
+/* Claim the parport or block trying unless we've already claimed it */
+static void lp_release_parport(struct lp_struct *this_lp)
+{
+	if (test_and_clear_bit(LP_PARPORT_CLAIMED, &this_lp->bits)) {
+		parport_release (this_lp->dev);
+	}
+}
+
+
+
+static int lp_preempt(void *handle)
+{
+	struct lp_struct *this_lp = (struct lp_struct *)handle;
+	set_bit(LP_PREEMPT_REQUEST, &this_lp->bits);
+	return (1);
+}
+
+
+/* 
+ * Try to negotiate to a new mode; if unsuccessful negotiate to
+ * compatibility mode.  Return the mode we ended up in.
+ */
+static int lp_negotiate(struct parport * port, int mode)
+{
+	if (parport_negotiate (port, mode) != 0) {
+		mode = IEEE1284_MODE_COMPAT;
+		parport_negotiate (port, mode);
+	}
+
+	return (mode);
+}
+
+static int lp_reset(int minor)
+{
+	int retval;
+	lp_claim_parport_or_block (&lp_table[minor]);
+	w_ctr(minor, LP_PSELECP);
+	udelay (LP_DELAY);
+	w_ctr(minor, LP_PSELECP | LP_PINITP);
+	retval = r_str(minor);
+	lp_release_parport (&lp_table[minor]);
+	return retval;
+}
+
+static void lp_error (int minor)
+{
+	int polling;
+
+	if (LP_F(minor) & LP_ABORT)
+		return;
+
+	polling = lp_table[minor].dev->port->irq == PARPORT_IRQ_NONE;
+	if (polling) lp_release_parport (&lp_table[minor]);
+	interruptible_sleep_on_timeout (&lp_table[minor].waitq,
+					LP_TIMEOUT_POLLED);
+	if (polling) lp_claim_parport_or_block (&lp_table[minor]);
+	else parport_yield_blocking (lp_table[minor].dev);
+}
+
+static int lp_check_status(int minor)
+{
+	int error = 0;
+	unsigned int last = lp_table[minor].last_error;
+	unsigned char status = r_str(minor);
+	if ((status & LP_PERRORP) && !(LP_F(minor) & LP_CAREFUL))
+		/* No error. */
+		last = 0;
+	else if ((status & LP_POUTPA)) {
+		if (last != LP_POUTPA) {
+			last = LP_POUTPA;
+			printk(KERN_INFO "lp%d out of paper\n", minor);
+		}
+		error = -ENOSPC;
+	} else if (!(status & LP_PSELECD)) {
+		if (last != LP_PSELECD) {
+			last = LP_PSELECD;
+			printk(KERN_INFO "lp%d off-line\n", minor);
+		}
+		error = -EIO;
+	} else if (!(status & LP_PERRORP)) {
+		if (last != LP_PERRORP) {
+			last = LP_PERRORP;
+			printk(KERN_INFO "lp%d on fire\n", minor);
+		}
+		error = -EIO;
+	} else {
+		last = 0; /* Come here if LP_CAREFUL is set and no
+                             errors are reported. */
+	}
+
+	lp_table[minor].last_error = last;
+
+	if (last != 0)
+		lp_error(minor);
+
+	return error;
+}
+
+static int lp_wait_ready(int minor, int nonblock)
+{
+	int error = 0;
+
+	/* If we're not in compatibility mode, we're ready now! */
+	if (lp_table[minor].current_mode != IEEE1284_MODE_COMPAT) {
+	  return (0);
+	}
+
+	do {
+		error = lp_check_status (minor);
+		if (error && (nonblock || (LP_F(minor) & LP_ABORT)))
+			break;
+		if (signal_pending (current)) {
+			error = -EINTR;
+			break;
+		}
+	} while (error);
+	return error;
+}
+
+static ssize_t lp_write(struct file * file, const char * buf,
+		        size_t count, loff_t *ppos)
+{
+	unsigned int minor = iminor(file->f_dentry->d_inode);
+	struct parport *port = lp_table[minor].dev->port;
+	char *kbuf = lp_table[minor].lp_buffer;
+	ssize_t retv = 0;
+	ssize_t written;
+	size_t copy_size = count;
+	int nonblock = ((file->f_flags & O_NONBLOCK) ||
+			(LP_F(minor) & LP_ABORT));
+
+#ifdef LP_STATS
+	if (jiffies-lp_table[minor].lastcall > LP_TIME(minor))
+		lp_table[minor].runchars = 0;
+
+	lp_table[minor].lastcall = jiffies;
+#endif
+
+	/* Need to copy the data from user-space. */
+	if (copy_size > LP_BUFFER_SIZE)
+		copy_size = LP_BUFFER_SIZE;
+
+	if (copy_from_user (kbuf, buf, copy_size))
+		return -EFAULT;
+
+	if (down_interruptible (&lp_table[minor].port_mutex))
+		return -EINTR;
+
+ 	/* Claim Parport or sleep until it becomes available
+ 	 */
+	lp_claim_parport_or_block (&lp_table[minor]);
+	/* Go to the proper mode. */
+	lp_table[minor].current_mode = lp_negotiate (port, 
+						     lp_table[minor].best_mode);
+
+	parport_set_timeout (lp_table[minor].dev,
+			     (nonblock ? PARPORT_INACTIVITY_O_NONBLOCK
+			      : lp_table[minor].timeout));
+
+	if ((retv = lp_wait_ready (minor, nonblock)) == 0)
+	do {
+		/* Write the data. */
+		written = parport_write (port, kbuf, copy_size);
+		if (written > 0) {
+			copy_size -= written;
+			count -= written;
+			buf  += written;
+			retv += written;
+		}
+
+		if (signal_pending (current)) {
+			if (retv == 0)
+				retv = -EINTR;
+
+			break;
+		}
+
+		if (copy_size > 0) {
+			/* incomplete write -> check error ! */
+			int error;
+
+			parport_negotiate (lp_table[minor].dev->port, 
+					   IEEE1284_MODE_COMPAT);
+			lp_table[minor].current_mode = IEEE1284_MODE_COMPAT;
+
+			error = lp_wait_ready (minor, nonblock);
+
+			if (error) {
+				if (retv == 0)
+					retv = error;
+				break;
+			} else if (nonblock) {
+				if (retv == 0)
+					retv = -EAGAIN;
+				break;
+			}
+
+			parport_yield_blocking (lp_table[minor].dev);
+			lp_table[minor].current_mode 
+			  = lp_negotiate (port, 
+					  lp_table[minor].best_mode);
+
+		} else if (need_resched())
+			schedule ();
+
+		if (count) {
+			copy_size = count;
+			if (copy_size > LP_BUFFER_SIZE)
+				copy_size = LP_BUFFER_SIZE;
+
+			if (copy_from_user(kbuf, buf, copy_size)) {
+				if (retv == 0)
+					retv = -EFAULT;
+				break;
+			}
+		}	
+	} while (count > 0);
+
+	if (test_and_clear_bit(LP_PREEMPT_REQUEST, 
+			       &lp_table[minor].bits)) {
+		printk(KERN_INFO "lp%d releasing parport\n", minor);
+		parport_negotiate (lp_table[minor].dev->port, 
+				   IEEE1284_MODE_COMPAT);
+		lp_table[minor].current_mode = IEEE1284_MODE_COMPAT;
+		lp_release_parport (&lp_table[minor]);
+	}
+
+	up (&lp_table[minor].port_mutex);
+
+ 	return retv;
+}
+
+#ifdef CONFIG_PARPORT_1284
+
+/* Status readback conforming to ieee1284 */
+static ssize_t lp_read(struct file * file, char * buf,
+		       size_t count, loff_t *ppos)
+{
+	unsigned int minor=iminor(file->f_dentry->d_inode);
+	struct parport *port = lp_table[minor].dev->port;
+	ssize_t retval = 0;
+	char *kbuf = lp_table[minor].lp_buffer;
+	int nonblock = ((file->f_flags & O_NONBLOCK) ||
+			(LP_F(minor) & LP_ABORT));
+
+	if (count > LP_BUFFER_SIZE)
+		count = LP_BUFFER_SIZE;
+
+	if (down_interruptible (&lp_table[minor].port_mutex))
+		return -EINTR;
+
+	lp_claim_parport_or_block (&lp_table[minor]);
+
+	parport_set_timeout (lp_table[minor].dev,
+			     (nonblock ? PARPORT_INACTIVITY_O_NONBLOCK
+			      : lp_table[minor].timeout));
+
+	parport_negotiate (lp_table[minor].dev->port, IEEE1284_MODE_COMPAT);
+	if (parport_negotiate (lp_table[minor].dev->port,
+			       IEEE1284_MODE_NIBBLE)) {
+		retval = -EIO;
+		goto out;
+	}
+
+	while (retval == 0) {
+		retval = parport_read (port, kbuf, count);
+
+		if (retval > 0)
+			break;
+
+		if (nonblock) {
+			retval = -EAGAIN;
+			break;
+		}
+
+		/* Wait for data. */
+
+		if (lp_table[minor].dev->port->irq == PARPORT_IRQ_NONE) {
+			parport_negotiate (lp_table[minor].dev->port,
+					   IEEE1284_MODE_COMPAT);
+			lp_error (minor);
+			if (parport_negotiate (lp_table[minor].dev->port,
+					       IEEE1284_MODE_NIBBLE)) {
+				retval = -EIO;
+				goto out;
+			}
+		} else
+			interruptible_sleep_on_timeout (&lp_table[minor].waitq,
+							LP_TIMEOUT_POLLED);
+
+		if (signal_pending (current)) {
+			retval = -ERESTARTSYS;
+			break;
+		}
+
+		cond_resched ();
+	}
+	parport_negotiate (lp_table[minor].dev->port, IEEE1284_MODE_COMPAT);
+ out:
+	lp_release_parport (&lp_table[minor]);
+
+	if (retval > 0 && copy_to_user (buf, kbuf, retval))
+		retval = -EFAULT;
+
+	up (&lp_table[minor].port_mutex);
+
+	return retval;
+}
+
+#endif /* IEEE 1284 support */
+
+static int lp_open(struct inode * inode, struct file * file)
+{
+	unsigned int minor = iminor(inode);
+
+	printk(KERN_INFO "Device driver de lp abierto"); 
+
+	if (minor >= LP_NO)
+		return -ENXIO;
+	if ((LP_F(minor) & LP_EXIST) == 0)
+		return -ENXIO;
+	if (test_and_set_bit(LP_BUSY_BIT_POS, &LP_F(minor)))
+		return -EBUSY;
+
+	/* If ABORTOPEN is set and the printer is offline or out of paper,
+	   we may still want to open it to perform ioctl()s.  Therefore we
+	   have commandeered O_NONBLOCK, even though it is being used in
+	   a non-standard manner.  This is strictly a Linux hack, and
+	   should most likely only ever be used by the tunelp application. */
+	if ((LP_F(minor) & LP_ABORTOPEN) && !(file->f_flags & O_NONBLOCK)) {
+		int status;
+		lp_claim_parport_or_block (&lp_table[minor]);
+		status = r_str(minor);
+		lp_release_parport (&lp_table[minor]);
+		if (status & LP_POUTPA) {
+			printk(KERN_INFO "lp%d out of paper\n", minor);
+			LP_F(minor) &= ~LP_BUSY;
+			return -ENOSPC;
+		} else if (!(status & LP_PSELECD)) {
+			printk(KERN_INFO "lp%d off-line\n", minor);
+			LP_F(minor) &= ~LP_BUSY;
+			return -EIO;
+		} else if (!(status & LP_PERRORP)) {
+			printk(KERN_ERR "lp%d printer error\n", minor);
+			LP_F(minor) &= ~LP_BUSY;
+			return -EIO;
+		}
+	}
+	lp_table[minor].lp_buffer = (char *) kmalloc(LP_BUFFER_SIZE, GFP_KERNEL);
+	if (!lp_table[minor].lp_buffer) {
+		LP_F(minor) &= ~LP_BUSY;
+		return -ENOMEM;
+	}
+	/* Determine if the peripheral supports ECP mode */
+	lp_claim_parport_or_block (&lp_table[minor]);
+	if ( (lp_table[minor].dev->port->modes & PARPORT_MODE_ECP) &&
+             !parport_negotiate (lp_table[minor].dev->port, 
+                                 IEEE1284_MODE_ECP)) {
+		printk (KERN_INFO "lp%d: ECP mode\n", minor);
+		lp_table[minor].best_mode = IEEE1284_MODE_ECP;
+	} else {
+		lp_table[minor].best_mode = IEEE1284_MODE_COMPAT;
+	}
+	/* Leave peripheral in compatibility mode */
+	parport_negotiate (lp_table[minor].dev->port, IEEE1284_MODE_COMPAT);
+	lp_release_parport (&lp_table[minor]);
+	lp_table[minor].current_mode = IEEE1284_MODE_COMPAT;
+	return 0;
+}
+
+static int lp_release(struct inode * inode, struct file * file)
+{
+	unsigned int minor = iminor(inode);
+
+	lp_claim_parport_or_block (&lp_table[minor]);
+	parport_negotiate (lp_table[minor].dev->port, IEEE1284_MODE_COMPAT);
+	lp_table[minor].current_mode = IEEE1284_MODE_COMPAT;
+	lp_release_parport (&lp_table[minor]);
+	kfree(lp_table[minor].lp_buffer);
+	lp_table[minor].lp_buffer = NULL;
+	LP_F(minor) &= ~LP_BUSY;
+	return 0;
+}
+
+static int lp_ioctl(struct inode *inode, struct file *file,
+		    unsigned int cmd, unsigned long arg)
+{
+	unsigned int minor = iminor(inode);
+	int status;
+	int retval = 0;
+
+#ifdef LP_DEBUG
+	printk(KERN_DEBUG "lp%d ioctl, cmd: 0x%x, arg: 0x%lx\n", minor, cmd, arg);
+#endif
+	if (minor >= LP_NO)
+		return -ENODEV;
+	if ((LP_F(minor) & LP_EXIST) == 0)
+		return -ENODEV;
+	switch ( cmd ) {
+		struct timeval par_timeout;
+		long to_jiffies;
+
+		case LPTIME:
+			LP_TIME(minor) = arg * HZ/100;
+			break;
+		case LPCHAR:
+			LP_CHAR(minor) = arg;
+			break;
+		case LPABORT:
+			if (arg)
+				LP_F(minor) |= LP_ABORT;
+			else
+				LP_F(minor) &= ~LP_ABORT;
+			break;
+		case LPABORTOPEN:
+			if (arg)
+				LP_F(minor) |= LP_ABORTOPEN;
+			else
+				LP_F(minor) &= ~LP_ABORTOPEN;
+			break;
+		case LPCAREFUL:
+			if (arg)
+				LP_F(minor) |= LP_CAREFUL;
+			else
+				LP_F(minor) &= ~LP_CAREFUL;
+			break;
+		case LPWAIT:
+			LP_WAIT(minor) = arg;
+			break;
+		case LPSETIRQ: 
+			return -EINVAL;
+			break;
+		case LPGETIRQ:
+			if (copy_to_user((int *) arg, &LP_IRQ(minor),
+					sizeof(int)))
+				return -EFAULT;
+			break;
+		case LPGETSTATUS:
+			lp_claim_parport_or_block (&lp_table[minor]);
+			status = r_str(minor);
+			lp_release_parport (&lp_table[minor]);
+
+			if (copy_to_user((int *) arg, &status, sizeof(int)))
+				return -EFAULT;
+			break;
+		case LPRESET:
+			lp_reset(minor);
+			break;
+#ifdef LP_STATS
+		case LPGETSTATS:
+			if (copy_to_user((int *) arg, &LP_STAT(minor),
+					sizeof(struct lp_stats)))
+				return -EFAULT;
+			if (capable(CAP_SYS_ADMIN))
+				memset(&LP_STAT(minor), 0,
+						sizeof(struct lp_stats));
+			break;
+#endif
+ 		case LPGETFLAGS:
+ 			status = LP_F(minor);
+			if (copy_to_user((int *) arg, &status, sizeof(int)))
+				return -EFAULT;
+			break;
+
+		case LPSETTIMEOUT:
+			if (copy_from_user (&par_timeout,
+					    (struct timeval *) arg,
+					    sizeof (struct timeval))) {
+				return -EFAULT;
+			}
+			/* Convert to jiffies, place in lp_table */
+			if ((par_timeout.tv_sec < 0) ||
+			    (par_timeout.tv_usec < 0)) {
+				return -EINVAL;
+			}
+			to_jiffies = ROUND_UP(par_timeout.tv_usec, 1000000/HZ);
+			to_jiffies += par_timeout.tv_sec * (long) HZ;
+			if (to_jiffies <= 0) {
+				return -EINVAL;
+			}
+			lp_table[minor].timeout = to_jiffies;
+			break;
+
+		default:
+			retval = -EINVAL;
+	}
+	return retval;
+}
+
+static struct file_operations lp_fops = {
+	.owner		= THIS_MODULE,
+	.write		= lp_write,
+	.ioctl		= lp_ioctl,
+	.open		= lp_open,
+	.release	= lp_release,
+#ifdef CONFIG_PARPORT_1284
+	.read		= lp_read,
+#endif
+};
+
+/* --- support for console on the line printer ----------------- */
+
+#ifdef CONFIG_LP_CONSOLE
+
+#define CONSOLE_LP 0
+
+/* If the printer is out of paper, we can either lose the messages or
+ * stall until the printer is happy again.  Define CONSOLE_LP_STRICT
+ * non-zero to get the latter behaviour. */
+#define CONSOLE_LP_STRICT 1
+
+/* The console must be locked when we get here. */
+
+static void lp_console_write (struct console *co, const char *s,
+			      unsigned count)
+{
+	struct pardevice *dev = lp_table[CONSOLE_LP].dev;
+	struct parport *port = dev->port;
+	ssize_t written;
+
+	if (parport_claim (dev))
+		/* Nothing we can do. */
+		return;
+
+	parport_set_timeout (dev, 0);
+
+	/* Go to compatibility mode. */
+	parport_negotiate (port, IEEE1284_MODE_COMPAT);
+
+	do {
+		/* Write the data, converting LF->CRLF as we go. */
+		ssize_t canwrite = count;
+		char *lf = memchr (s, '\n', count);
+		if (lf)
+			canwrite = lf - s;
+
+		if (canwrite > 0) {
+			written = parport_write (port, s, canwrite);
+
+			if (written <= 0)
+				continue;
+
+			s += written;
+			count -= written;
+			canwrite -= written;
+		}
+
+		if (lf && canwrite <= 0) {
+			const char *crlf = "\r\n";
+			int i = 2;
+
+			/* Dodge the original '\n', and put '\r\n' instead. */
+			s++;
+			count--;
+			do {
+				written = parport_write (port, crlf, i);
+				if (written > 0)
+					i -= written, crlf += written;
+			} while (i > 0 && (CONSOLE_LP_STRICT || written > 0));
+		}
+	} while (count > 0 && (CONSOLE_LP_STRICT || written > 0));
+
+	parport_release (dev);
+}
+
+static struct console lpcons = {
+	.name		= "lp",
+	.write		= lp_console_write,
+	.flags		= CON_PRINTBUFFER,
+};
+
+#endif /* console on line printer */
+
+/* --- initialisation code ------------------------------------- */
+
+static int parport_nr[LP_NO] = { [0 ... LP_NO-1] = LP_PARPORT_UNSPEC };
+static char *parport[LP_NO] = { NULL,  };
+static int reset = 0;
+
+MODULE_PARM(parport, "1-" __MODULE_STRING(LP_NO) "s");
+MODULE_PARM(reset, "i");
+
+#ifndef MODULE
+static int __init lp_setup (char *str)
+{
+	static int parport_ptr; // initially zero
+	int x;
+
+	if (get_option (&str, &x)) {
+		if (x == 0) {
+			/* disable driver on "lp=" or "lp=0" */
+			parport_nr[0] = LP_PARPORT_OFF;
+		} else {
+			printk(KERN_WARNING "warning: 'lp=0x%x' is deprecated, ignored\n", x);
+			return 0;
+		}
+	} else if (!strncmp(str, "parport", 7)) {
+		int n = simple_strtoul(str+7, NULL, 10);
+		if (parport_ptr < LP_NO)
+			parport_nr[parport_ptr++] = n;
+		else
+			printk(KERN_INFO "lp: too many ports, %s ignored.\n",
+			       str);
+	} else if (!strcmp(str, "auto")) {
+		parport_nr[0] = LP_PARPORT_AUTO;
+	} else if (!strcmp(str, "none")) {
+		parport_nr[parport_ptr++] = LP_PARPORT_NONE;
+	} else if (!strcmp(str, "reset")) {
+		reset = 1;
+	}
+	return 1;
+}
+#endif
+
+static int lp_register(int nr, struct parport *port)
+{
+	lp_table[nr].dev = parport_register_device(port, "lp", 
+						   lp_preempt, NULL, NULL, 0,
+						   (void *) &lp_table[nr]);
+	if (lp_table[nr].dev == NULL)
+		return 1;
+	lp_table[nr].flags |= LP_EXIST;
+
+	if (reset)
+		lp_reset(nr);
+
+	class_simple_device_add(lp_class, MKDEV(LP_MAJOR, nr), NULL,
+				"lp%d", nr);
+	devfs_mk_cdev(MKDEV(LP_MAJOR, nr), S_IFCHR | S_IRUGO | S_IWUGO,
+			"printers/%d", nr);
+
+	printk(KERN_INFO "lp%d: using %s (%s).\n", nr, port->name, 
+	       (port->irq == PARPORT_IRQ_NONE)?"polling":"interrupt-driven");
+
+#ifdef CONFIG_LP_CONSOLE
+	if (!nr) {
+		if (port->modes & PARPORT_MODE_SAFEININT) {
+			register_console (&lpcons);
+			console_registered = port;
+			printk (KERN_INFO "lp%d: console ready\n", CONSOLE_LP);
+		} else
+			printk (KERN_ERR "lp%d: cannot run console on %s\n",
+				CONSOLE_LP, port->name);
+	}
+#endif
+
+	return 0;
+}
+
+static void lp_attach (struct parport *port)
+{
+	unsigned int i;
+
+	switch (parport_nr[0])
+	{
+	case LP_PARPORT_UNSPEC:
+	case LP_PARPORT_AUTO:
+		if (parport_nr[0] == LP_PARPORT_AUTO &&
+		    port->probe_info[0].class != PARPORT_CLASS_PRINTER)
+			return;
+		if (lp_count == LP_NO) {
+			printk(KERN_INFO "lp: ignoring parallel port (max. %d)\n",LP_NO);
+			return;
+		}
+		if (!lp_register(lp_count, port))
+			lp_count++;
+		break;
+
+	default:
+		for (i = 0; i < LP_NO; i++) {
+			if (port->number == parport_nr[i]) {
+				if (!lp_register(i, port))
+					lp_count++;
+				break;
+			}
+		}
+		break;
+	}
+}
+
+static void lp_detach (struct parport *port)
+{
+	/* Write this some day. */
+#ifdef CONFIG_LP_CONSOLE
+	if (console_registered == port) {
+		unregister_console (&lpcons);
+		console_registered = NULL;
+	}
+#endif /* CONFIG_LP_CONSOLE */
+}
+
+static struct parport_driver lp_driver = {
+	.name = "lp",
+	.attach = lp_attach,
+	.detach = lp_detach,
+};
+
+int __init lp_init (void)
+{
+	int i;
+
+	if (parport_nr[0] == LP_PARPORT_OFF)
+		return 0;
+
+	for (i = 0; i < LP_NO; i++) {
+		lp_table[i].dev = NULL;
+		lp_table[i].flags = 0;
+		lp_table[i].chars = LP_INIT_CHAR;
+		lp_table[i].time = LP_INIT_TIME;
+		lp_table[i].wait = LP_INIT_WAIT;
+		lp_table[i].lp_buffer = NULL;
+#ifdef LP_STATS
+		lp_table[i].lastcall = 0;
+		lp_table[i].runchars = 0;
+		memset (&lp_table[i].stats, 0, sizeof (struct lp_stats));
+#endif
+		lp_table[i].last_error = 0;
+		init_waitqueue_head (&lp_table[i].waitq);
+		init_waitqueue_head (&lp_table[i].dataq);
+		init_MUTEX (&lp_table[i].port_mutex);
+		lp_table[i].timeout = 10 * HZ;
+	}
+
+	if (register_chrdev (LP_MAJOR, "lp", &lp_fops)) {
+		printk (KERN_ERR "lp: unable to get major %d\n", LP_MAJOR);
+		return -EIO;
+	}
+
+	devfs_mk_dir("printers");
+	lp_class = class_simple_create(THIS_MODULE, "printer");
+
+	if (parport_register_driver (&lp_driver)) {
+		printk (KERN_ERR "lp: unable to register with parport\n");
+		return -EIO;
+	}
+
+	if (!lp_count) {
+		printk (KERN_INFO "lp: driver loaded but no devices found\n");
+#ifndef CONFIG_PARPORT_1284
+		if (parport_nr[0] == LP_PARPORT_AUTO)
+			printk (KERN_INFO "lp: (is IEEE 1284 support enabled?)\n");
+#endif
+	}
+
+	return 0;
+}
+
+static int __init lp_init_module (void)
+{
+	if (parport[0]) {
+		/* The user gave some parameters.  Let's see what they were.  */
+		if (!strncmp(parport[0], "auto", 4))
+			parport_nr[0] = LP_PARPORT_AUTO;
+		else {
+			int n;
+			for (n = 0; n < LP_NO && parport[n]; n++) {
+				if (!strncmp(parport[n], "none", 4))
+					parport_nr[n] = LP_PARPORT_NONE;
+				else {
+					char *ep;
+					unsigned long r = simple_strtoul(parport[n], &ep, 0);
+					if (ep != parport[n]) 
+						parport_nr[n] = r;
+					else {
+						printk(KERN_ERR "lp: bad port specifier `%s'\n", parport[n]);
+						return -ENODEV;
+					}
+				}
+			}
+		}
+	}
+
+	return lp_init();
+}
+
+static void lp_cleanup_module (void)
+{
+	unsigned int offset;
+
+	parport_unregister_driver (&lp_driver);
+
+#ifdef CONFIG_LP_CONSOLE
+	unregister_console (&lpcons);
+#endif
+
+	unregister_chrdev(LP_MAJOR, "lp");
+	for (offset = 0; offset < LP_NO; offset++) {
+		if (lp_table[offset].dev == NULL)
+			continue;
+		parport_unregister_device(lp_table[offset].dev);
+		devfs_remove("printers/%d", offset);
+		class_simple_device_remove(MKDEV(LP_MAJOR, offset));
+	}
+	devfs_remove("printers");
+	class_simple_destroy(lp_class);
+}
+
+__setup("lp=", lp_setup);
+module_init(lp_init_module);
+module_exit(lp_cleanup_module);
+
+MODULE_ALIAS_CHARDEV_MAJOR(LP_MAJOR);
+MODULE_LICENSE("GPL");
+
+
+FICHERO MAJOR.H
+===============
+
+#ifndef _LINUX_MAJOR_H
+#define _LINUX_MAJOR_H
+
+/*
+ * This file has definitions for major device numbers.
+ * For the device number assignments, see Documentation/devices.txt.
+ */
+
+#define UNNAMED_MAJOR		0
+#define MEM_MAJOR		1
+#define RAMDISK_MAJOR		1
+#define FLOPPY_MAJOR		2
+#define PTY_MASTER_MAJOR	2
+#define IDE0_MAJOR		3
+#define HD_MAJOR		IDE0_MAJOR
+#define PTY_SLAVE_MAJOR		3
+#define TTY_MAJOR		4
+#define TTYAUX_MAJOR		5
+#define LP_MAJOR		6
+#define VCS_MAJOR		7
+#define LOOP_MAJOR		7
+#define SCSI_DISK0_MAJOR	8
+#define SCSI_TAPE_MAJOR		9
+#define MD_MAJOR		9
+#define MISC_MAJOR		10
+#define SCSI_CDROM_MAJOR	11
+#define MUX_MAJOR		11	/* PA-RISC only */
+#define QIC02_TAPE_MAJOR	12
+#define XT_DISK_MAJOR		13
+#define INPUT_MAJOR		13
+#define SOUND_MAJOR		14
+#define CDU31A_CDROM_MAJOR	15
+#define JOYSTICK_MAJOR		15
+#define GOLDSTAR_CDROM_MAJOR	16
+#define OPTICS_CDROM_MAJOR	17
+#define SANYO_CDROM_MAJOR	18
+#define CYCLADES_MAJOR		19
+#define CYCLADESAUX_MAJOR	20
+#define MITSUMI_X_CDROM_MAJOR	20
+#define MFM_ACORN_MAJOR		21	/* ARM Linux /dev/mfm */
+#define SCSI_GENERIC_MAJOR	21
+#define IDE1_MAJOR		22
+#define DIGICU_MAJOR		22
+#define DIGI_MAJOR		23
+#define MITSUMI_CDROM_MAJOR	23
+#define CDU535_CDROM_MAJOR	24
+#define STL_SERIALMAJOR		24
+#define MATSUSHITA_CDROM_MAJOR	25
+#define STL_CALLOUTMAJOR	25
+#define MATSUSHITA_CDROM2_MAJOR	26
+#define QIC117_TAPE_MAJOR	27
+#define MATSUSHITA_CDROM3_MAJOR	27
+#define MATSUSHITA_CDROM4_MAJOR	28
+#define STL_SIOMEMMAJOR		28
+#define ACSI_MAJOR		28
+#define AZTECH_CDROM_MAJOR	29
+#define GRAPHDEV_MAJOR		29   /* SparcLinux & Linux/68k /dev/fb */
+#define CM206_CDROM_MAJOR	32
+#define IDE2_MAJOR		33
+#define IDE3_MAJOR		34
+#define Z8530_MAJOR		34
+#define XPRAM_MAJOR		35   /* Expanded storage on S/390: "slow ram"*/
+#define NETLINK_MAJOR		36
+#define PS2ESDI_MAJOR		36
+#define IDETAPE_MAJOR		37
+#define Z2RAM_MAJOR		37
+#define APBLOCK_MAJOR		38   /* AP1000 Block device */
+#define DDV_MAJOR		39   /* AP1000 DDV block device */
+#define NBD_MAJOR		43   /* Network block device	*/
+#define RISCOM8_NORMAL_MAJOR	48
+#define DAC960_MAJOR		48   /* 48..55 */
+#define RISCOM8_CALLOUT_MAJOR	49
+#define MKISS_MAJOR		55
+#define DSP56K_MAJOR		55   /* DSP56001 processor device */
+
+#define IDE4_MAJOR		56
+#define IDE5_MAJOR		57
+
+#define SCSI_DISK1_MAJOR	65
+#define SCSI_DISK2_MAJOR	66
+#define SCSI_DISK3_MAJOR	67
+#define SCSI_DISK4_MAJOR	68
+#define SCSI_DISK5_MAJOR	69
+#define SCSI_DISK6_MAJOR	70
+#define SCSI_DISK7_MAJOR	71
+
+#define COMPAQ_SMART2_MAJOR	72
+#define COMPAQ_SMART2_MAJOR1	73
+#define COMPAQ_SMART2_MAJOR2	74
+#define COMPAQ_SMART2_MAJOR3	75
+#define COMPAQ_SMART2_MAJOR4	76
+#define COMPAQ_SMART2_MAJOR5	77
+#define COMPAQ_SMART2_MAJOR6	78
+#define COMPAQ_SMART2_MAJOR7	79
+
+#define SPECIALIX_NORMAL_MAJOR	75
+#define SPECIALIX_CALLOUT_MAJOR	76
+
+#define AURORA_MAJOR		79
+
+#define I2O_MAJOR		80	/* 80->87 */
+
+#define SHMIQ_MAJOR		85   /* Linux/mips, SGI /dev/shmiq */
+
+#define IDE6_MAJOR		88
+#define IDE7_MAJOR		89
+#define IDE8_MAJOR		90
+#define IDE9_MAJOR		91
+
+#define DASD_MAJOR		94
+
+#define MDISK_MAJOR		95
+
+#define UBD_MAJOR		98
+
+#define JSFD_MAJOR		99
+
+#define PHONE_MAJOR		100
+
+#define COMPAQ_CISS_MAJOR	104
+#define COMPAQ_CISS_MAJOR1	105
+#define COMPAQ_CISS_MAJOR2      106
+#define COMPAQ_CISS_MAJOR3      107
+#define COMPAQ_CISS_MAJOR4      108
+#define COMPAQ_CISS_MAJOR5      109
+#define COMPAQ_CISS_MAJOR6      110
+#define COMPAQ_CISS_MAJOR7      111
+
+#define ATARAID_MAJOR		114
+
+#define SCSI_DISK8_MAJOR	128
+#define SCSI_DISK9_MAJOR	129
+#define SCSI_DISK10_MAJOR	130
+#define SCSI_DISK11_MAJOR	131
+#define SCSI_DISK12_MAJOR	132
+#define SCSI_DISK13_MAJOR	133
+#define SCSI_DISK14_MAJOR	134
+#define SCSI_DISK15_MAJOR	135
+
+#define UNIX98_PTY_MASTER_MAJOR	128
+#define UNIX98_PTY_MAJOR_COUNT	8
+#define UNIX98_PTY_SLAVE_MAJOR	(UNIX98_PTY_MASTER_MAJOR+UNIX98_PTY_MAJOR_COUNT)
+
+#define RTF_MAJOR		150
+#define RAW_MAJOR		162
+
+#define USB_ACM_MAJOR		166
+#define USB_ACM_AUX_MAJOR	167
+#define USB_CHAR_MAJOR		180
+
+#define VXVM_MAJOR		199	/* VERITAS volume i/o driver    */
+#define VXSPEC_MAJOR		200	/* VERITAS volume config driver */
+#define VXDMP_MAJOR		201	/* VERITAS volume multipath driver */
+
+#define MSR_MAJOR		202
+#define CPUID_MAJOR		203
+
+#define OSST_MAJOR		206	/* OnStream-SCx0 SCSI tape */
+
+#define IBM_TTY3270_MAJOR	227
+#define IBM_FS3270_MAJOR	228
+
+#endif

@@ -1,0 +1,153 @@
+0xdffff498	------>	0xc9 (201)------------------> array[0]	\
+0xdffff49c	------>	0xca (202)------------------> array[1]	 \
+0xdffff4a0	------>	0xcb (203)------------------> array[2]	  |--> variable local array
+0xdffff4a4	------>	0xcc (204)------------------> array[3]	 /
+0xdffff4a8	------>	0xcd (205)------------------> array[4]	/
+0xdffff4ac	------>	0x0 (0)
+0xdffff4b0	------>	0x0 (0)
+0xdffff4b4	------>	0x309 (777)-----------------> variable local k
+0xdffff4b8	------>	0x8 (8)---------------------> variable local j
+0xdffff4bc	------>	0x22b (555)-----------------> variable local i
+-------------------------------------------------------------------------------------------------------
+0xdffff4c0	------>	0x0 (0)
+0xdffff4c4	------>	0x0 (0)
+0xdffff4c8	------>	0x0 (0)
+0xdffff4cc	------>	0x0 (0)
+0xdffff4d0	------>	0x0 (0)
+0xdffff4d4	------>	0x1031b (66331)
+0xdffff4d8	------>	0xdf7f9a84 (3749681796)
+0xdffff4dc	------>	0x10484 (66692)
+0xdffff4e0	------>	0xdf6dbbd4 (3748510676)
+0xdffff4e4	------>	0xdf7b0480 (3749381248)
+0xdffff4e8	------>	0x10420 (66592)
+0xdffff4ec	------>	0x0 (0)
+0xdffff4f0	------>	0x1 (1)---------------------> argumento a con el que fue llamada la funcion
+0xdffff4f4	------>	0x14 (20)-------------------> argumento b con el que fue llamada la funcion
+0xdffff4f8	------>	0x9 (9)---------------------> argumento c con el que fue llamada la funcion
+0xdffff4fc	------>	0x3 (3)
+0xdffff500	------>	0x222e8 (140008)
+0xdffff504	------>	0xdf6dbeb0 (3748511408)
+0xdffff508	------>	0xdffff568 (3758093672)
+0xdffff50c	------>	0x106b0 (67248)
+0xdffff510	------>	0x0 (0)
+0xdffff514	------>	0x1 (1)---------------------> argumento a con el que llama a la funcion recursiva
+0xdffff518	------>	0xc8 (200)------------------> argumento b con el que llama a la funcion recursiva
+0xdffff51c	------>	0x1b (27)-------------------> argumento c con el que llama a la funcion recursiva
+0xdffff520	------>	0xdf7f9a84 (3749681796)
+0xdffff524	------>	0xdf7b0090 (3749380240)
+0xdffff528	------>	0x4 (4)
+0xdffff52c	------>	0xdf7b03cc (3749381068)
+0xdffff530	------>	0x15 (21)-------------------> array[0]	\
+0xdffff534	------>	0x16 (22)-------------------> array[1]	 \
+0xdffff538	------>	0x17 (23)-------------------> array[2]	  |--> variable local array
+0xdffff53c	------>	0x18 (24)-------------------> array[3]	 /
+0xdffff540	------>	0x19 (25)-------------------> array[4]	/
+0xdffff544	------>	0xdf7c0000 (3749445632)
+0xdffff548	------>	0x0 (0)
+0xdffff54c	------>	0x309 (777)-----------------> variable local k
+0xdffff550	------>	0x5 (5)---------------------> variable local j
+0xdffff554	------>	0x22b (555)-----------------> variable local i
+------------------------------------------------------------------------------------------------------------
+0xdffff558	------>	0x5208 (21000)--------------> credencial de grupo
+0xdffff55c	------>	0x5666 (22118)--------------> credencial de usuario
+0xdffff560	------>	0x5666 (22118)--------------> credencial de usuario
+0xdffff564	------>	0x0 (0)
+0xdffff568	------>	0x2097c (133500)
+0xdffff56c	------>	0x0 (0)
+0xdffff570	------>	0x0 (0)
+0xdffff574	------>	0x0 (0)
+0xdffff578	------>	0x0 (0)
+0xdffff57c	------>	0x0 (0)
+0xdffff580	------>	0x0 (0)
+0xdffff584	------>	0x20820 (133152)
+0xdffff588	------>	0x1 (1)---------------------> argumento a con el que fue llamada la funcion
+0xdffff58c	------>	0x2 (2)---------------------> argumento b con el que fue llamada la funcion
+0xdffff590	------>	0x3 (3)---------------------> argumento c con el que fue llamada la funcion
+0xdffff594	------>	0x0 (0)
+0xdffff598	------>	0x222e8 (140008)
+0xdffff59c	------>	0xdf6dbc20 (3748510752)
+0xdffff5a0	------>	0xdffff600 (3758093824)
+0xdffff5a4	------>	0x10758 (67416)
+0xdffff5a8	------>	0xdffffff3 (3758096371)
+0xdffff5ac	------>	0x1 (1)---------------------> argumento a con el que llama a la funcion recursiva
+0xdffff5b0	------>	0x14 (20)-------------------> argumento b con el que llama a la funcion recursiva
+0xdffff5b4	------>	0x9 (9)---------------------> argumento c con el que llama a la funcion recursiva
+0xdffff5b8	------>	0x1031b (66331)
+0xdffff5bc	------>	0xdf7f9a84 (3749681796)
+0xdffff5c0	------>	0xdf7f9a84 (3749681796)
+0xdffff5c4	------>	0x4 (4)
+0xdffff5c8	------>	0x3 (3)-------------------> array[0]	\
+0xdffff5cc	------>	0x4 (4)-------------------> array[1]	 \
+0xdffff5d0	------>	0x5 (5)-------------------> array[2]	  |--> variable local array
+0xdffff5d4	------>	0x6 (6)-------------------> array[3]	 /
+0xdffff5d8	------>	0x7 (7)-------------------> array[4]	/
+0xdffff5dc	------>	0xdf7c1120 (3749450016)
+0xdffff5e0	------>	0x838 (2104)
+0xdffff5e4	------>	0x309 (777)-----------------> variable local k
+0xdffff5e8	------>	0x5 (5)---------------------> variable local j
+0xdffff5ec	------>	0x22b (555)-----------------> variable local i
+----------------------------------------------------------------------------------------------------------------
+0xdffff5f0	------>	0x0 (0)
+0xdffff5f4	------>	0x0 (0)
+0xdffff5f8	------>	0xdf7c2b50 (3749456720)
+0xdffff5fc	------>	0x0 (0)
+0xdffff600	------>	0xdf77e5f0 (3749176816)
+0xdffff604	------>	0x0 (0)
+0xdffff608	------>	0xdf7c2b50 (3749456720)
+0xdffff60c	------>	0x0 (0)
+0xdffff610	------>	0x4 (4)
+0xdffff614	------>	0x4 (4)
+0xdffff618	------>	0x7 (7)
+0xdffff61c	------>	0xdf7f8008 (3749675016)
+0xdffff620	------>	0x1 (1)
+0xdffff624	------>	0xdffff6d4 (3758094036)
+0xdffff628	------>	0xdffff6dc (3758094044)
+0xdffff62c	------>	0x209a8 (133544)
+0xdffff630	------>	0x0 (0)
+0xdffff634	------>	0x0 (0)
+0xdffff638	------>	0xdffff670 (3758093936)
+0xdffff63c	------>	0x104c4 (66756)
+0xdffff640	------>	0x0 (0)
+0xdffff644	------>	0x1 (1)
+0xdffff648	------>	0x2 (2)
+0xdffff64c	------>	0x3 (3)
+0xdffff650	------>	0x3 (3)
+0xdffff654	------>	0xdffff6d4 (3758094036)
+0xdffff658	------>	0x4 (4)
+0xdffff65c	------>	0xdffff6dc (3758094044)
+0xdffff660	------>	0x5 (5)
+0xdffff664	------>	0xdffff7bc (3758094268)
+0xdffff668	------>	0x0 (0)
+0xdffff66c	------>	0x0 (0)
+0xdffff670	------>	0x1 (1)
+0xdffff674	------>	0xdffff6d4 (3758094036)
+0xdffff678	------>	0x0 (0)
+0xdffff67c	------>	0x0 (0)
+0xdffff680	------>	0x0 (0)
+0xdffff684	------>	0x0 (0)
+0xdffff688	------>	0x0 (0)
+0xdffff68c	------>	0x0 (0)
+0xdffff690	------>	0x0 (0)
+0xdffff694	------>	0x0 (0)
+0xdffff698	------>	0x0 (0)
+0xdffff69c	------>	0x0 (0)
+0xdffff6a0	------>	0x0 (0)
+0xdffff6a4	------>	0x0 (0)
+0xdffff6a8	------>	0x0 (0)
+0xdffff6ac	------>	0x0 (0)
+0xdffff6b0	------>	0x0 (0)
+0xdffff6b4	------>	0x0 (0)
+0xdffff6b8	------>	0x0 (0)
+0xdffff6bc	------>	0x0 (0)
+0xdffff6c0	------>	0x0 (0)
+0xdffff6c4	------>	0x0 (0)
+0xdffff6c8	------>	0x0 (0)
+0xdffff6cc	------>	0x0 (0)
+0xdffff6d0	------>	0x1 (1)
+0xdffff6d4	------>	0xdffff834 (3758094388)
+0xdffff6d8	------>	0x0 (0)
+0xdffff6dc	------>	0xdffff839 (3758094393)
+0xdffff6e0	------>	0xdffff858 (3758094424)
+0xdffff6e4	------>	0xdffff874 (3758094452)
+0xdffff6e8	------>	0xdffff886 (3758094470)
+0xdffff6ec	------>	0xdffff88d (3758094477)
